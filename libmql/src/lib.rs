@@ -2,8 +2,8 @@ mod closest_string;
 mod yale_departments;
 
 mod parser;
+pub mod semantic_ir;
 
-#[path = "parser.rs"]
 #[cfg_attr(test, visibility::make(pub))]
 pub mod test_parser {
     pub use super::parser::*;
@@ -19,7 +19,14 @@ use crate::parser::MQLQueryFile;
 
 pub use parser::VarValue;
 
-pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+/// Version of the `libmql` package and its public SDK.
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// Normative version of documents emitted by the retained legacy parser.
+///
+/// Package 0.2 validates the new semantic IR, but it does not silently relabel
+/// the old ambiguous syntax as language version 0.2.
+pub const LEGACY_LANGUAGE_VERSION: &str = "0.1.12";
 
 #[derive(Debug, Clone)]
 pub struct ParseResult {
@@ -57,12 +64,17 @@ pub fn parse_extern_value(expr: &str) -> Result<VarValue> {
     )
 }
 
-fn parse_impl(text: &str, externals: std::collections::HashMap<String, VarValue>) -> Result<ParseResult> {
+fn parse_impl(
+    text: &str,
+    externals: std::collections::HashMap<String, VarValue>,
+) -> Result<ParseResult> {
     let mut pairs = MQLParser::parse(Rule::file, text)
         .map_err(|e| e.renamed_rules(parser::renamed_rules_impl))?;
 
-    let parsed_mql_file =
-        MQLParser::parse_file(pairs.next().context("File should have a child rule")?, externals)?;
+    let parsed_mql_file = MQLParser::parse_file(
+        pairs.next().context("File should have a child rule")?,
+        externals,
+    )?;
 
     Ok(ParseResult { parsed_mql_file })
 }

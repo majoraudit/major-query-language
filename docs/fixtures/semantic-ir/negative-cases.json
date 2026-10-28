@@ -1,0 +1,57 @@
+{
+  "schema_version": "0.2.0",
+  "base": "reference-fixtures.json#/fixtures/0/program",
+  "schema_cases": [
+    {
+      "case_id": "wrong_schema_version",
+      "operation": { "op": "replace", "path": "/schema_version", "value": "0.1.12" },
+      "expected_keyword": "const",
+      "expected_message_contains": "0.2.0"
+    },
+    {
+      "case_id": "decimal_credit_override",
+      "operation": { "op": "add", "path": "/requirements/0/contribution/fixed_credit_units", "value": 1.5 },
+      "expected_keyword": "type",
+      "expected_message_contains": "integer"
+    },
+    {
+      "case_id": "unscoped_constraint",
+      "operation": { "op": "remove", "path": "/constraints/0/scope" },
+      "base": "reference-fixtures.json#/fixtures/2/program",
+      "expected_keyword": "oneOf",
+      "expected_message_contains": "not valid under any of the given schemas"
+    },
+    {
+      "case_id": "malformed_author_id",
+      "operation": { "op": "replace", "path": "/requirements/0/meta/id", "value": "Not Stable" },
+      "expected_keyword": "pattern",
+      "expected_message_contains": "does not match"
+    }
+  ],
+  "semantic_cases": [
+    {
+      "case_id": "unresolved_requirement_reference",
+      "operation": { "op": "replace", "path": "/requirements/0/constraint_ids/0", "value": "missing_constraint" },
+      "base": "reference-fixtures.json#/fixtures/2/program",
+      "expected_code": "MQL0201_UNRESOLVED_ID"
+    },
+    {
+      "case_id": "missing_declared_choice",
+      "base": "reference-fixtures.json#/fixtures/7/cases/0",
+      "expected_status": "INDETERMINATE",
+      "expected_code": "MQL0202_DECLARED_CHOICE_MISSING"
+    },
+    {
+      "case_id": "conflicting_bound_effects",
+      "operation": { "op": "duplicate_effect_with_different_value", "path": "/effects/0" },
+      "base": "reference-fixtures.json#/fixtures/5/program",
+      "expected_code": "MQL0203_CONFLICTING_EFFECTS"
+    },
+    {
+      "case_id": "advisory_scope_forbidden",
+      "operation": { "op": "set_obligation_then_reference", "requirement": "electives", "obligation": "ADVISORY" },
+      "base": "reference-fixtures.json#/fixtures/0/program",
+      "expected_code": "MQL0204_ADVISORY_SCOPE"
+    }
+  ]
+}

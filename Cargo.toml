@@ -1,7 +1,11 @@
 [package]
 name = "pylibmql"
-version = "0.1.12"
+version = "0.2.0"
 edition = "2021"
+description = "Python bindings for the MQL parser and versioned semantic IR validator"
+repository = "https://github.com/mrodz/major-requirement-parser"
+readme = "README.md"
+publish = false
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
@@ -11,12 +15,10 @@ crate-type = ["cdylib"]
 [dependencies]
 pyo3 = { version = "0.27.1", features = ["abi3-py38"] }
 libmql = { path = "./libmql" }
+serde_json = "1.0.145"
 
 [features]
 extension-module = ["pyo3/extension-module"]
 
 [workspace]
 members = [ "cli", "libmql"]
-
-[build-dependencies]
-pyo3-build-config = { version = "0.28.3", features = ["resolve-config"] }

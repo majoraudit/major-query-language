@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mql.dev/schema/0.2/mql-ir.json",
+  "title": "MQL 0.2 Semantic IR",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "program_id", "catalog_year", "institution_schema", "credit_scale", "sources", "choices", "facts", "requirements", "constraints", "sharing_rules", "effects"],
+  "properties": {
+    "schema_version": { "const": "0.2.0" },
+    "program_id": { "$ref": "#/$defs/qualifiedId" },
+    "catalog_year": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{4}$" },
+    "institution_schema": { "$ref": "#/$defs/schemaRef" },
+    "credit_scale": { "type": "integer", "minimum": 1, "maximum": 4294967295 },
+    "sources": { "type": "array", "items": { "$ref": "#/$defs/source" }, "minItems": 1 },
+    "choices": { "type": "array", "items": { "$ref": "#/$defs/choice" } },
+    "facts": { "type": "array", "items": { "$ref": "#/$defs/factDeclaration" } },
+    "requirements": { "type": "array", "items": { "$ref": "#/$defs/requirement" }, "minItems": 1 },
+    "constraints": { "type": "array", "items": { "$ref": "#/$defs/constraint" } },
+    "sharing_rules": { "type": "array", "items": { "$ref": "#/$defs/sharingRule" } },
+    "effects": { "type": "array", "items": { "$ref": "#/$defs/effect" } },
+    "migration": { "$ref": "#/$defs/migration" }
+  },
+  "$defs": {
+    "authorId": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "qualifiedId": { "type": "string", "pattern": "^[a-z][a-z0-9_]*(::[a-z][a-z0-9_]*)*$" },
+    "nodeId": { "type": "string", "minLength": 1 },
+    "creditUnits": { "type": "integer", "minimum": 0 },
+    "schemaRef": {
+      "type": "object", "additionalProperties": false, "required": ["id", "version"],
+      "properties": { "id": { "type": "string", "format": "uri-reference" }, "version": { "type": "string", "minLength": 1 } }
+    },
+    "source": {
+      "type": "object", "additionalProperties": false, "required": ["source_id", "path"],
+      "properties": { "source_id": { "$ref": "#/$defs/authorId" }, "path": { "type": "string", "minLength": 1 }, "digest": { "type": "string" } }
+    },
+    "position": {
+      "type": "object", "additionalProperties": false, "required": ["byte", "line", "column"],
+      "properties": { "byte": { "type": "integer", "minimum": 0 }, "line": { "type": "integer", "minimum": 1, "maximum": 4294967295 }, "column": { "type": "integer", "minimum": 1, "maximum": 4294967295 } }
+    },
+    "sourceSpan": {
+      "type": "object", "additionalProperties": false, "required": ["source_id", "start", "end"],
+      "properties": { "source_id": { "$ref": "#/$defs/authorId" }, "start": { "$ref": "#/$defs/position" }, "end": { "$ref": "#/$defs/position" } }
+    },
+    "metadata": {
+      "type": "object", "additionalProperties": false, "required": ["id", "node_id", "description", "span", "provenance"],
+      "properties": {
+        "id": { "$ref": "#/$defs/qualifiedId" }, "node_id": { "$ref": "#/$defs/nodeId" }, "description": { "type": "string" },
+        "span": { "$ref": "#/$defs/sourceSpan" }, "provenance": { "type": "array", "items": { "$ref": "#/$defs/sourceSpan" }, "minItems": 1 }
+      }
+    },
+    "condition": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["kind", "value"], "properties": { "kind": { "const": "CONSTANT" }, "value": { "type": "boolean" } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "choice_id", "equals"], "properties": { "kind": { "const": "CHOICE_EQUALS" }, "choice_id": { "$ref": "#/$defs/qualifiedId" }, "equals": { "type": ["string", "integer", "boolean"] } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "fact_id"], "properties": { "kind": { "const": "FACT_PRESENT" }, "fact_id": { "$ref": "#/$defs/qualifiedId" } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "operands"], "properties": { "kind": { "enum": ["AND", "OR"] }, "operands": { "type": "array", "items": { "$ref": "#/$defs/condition" }, "minItems": 1 } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "operand"], "properties": { "kind": { "const": "NOT" }, "operand": { "$ref": "#/$defs/condition" } } }
+      ]
+    },
+    "bound": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["kind", "value"], "properties": { "kind": { "const": "FIXED" }, "value": { "type": "integer", "minimum": 0 } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "choice_id", "cases"], "properties": { "kind": { "const": "CHOICE_TABLE" }, "choice_id": { "$ref": "#/$defs/qualifiedId" }, "cases": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 }, "minProperties": 1 } } }
+      ]
+    },
+    "contribution": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "unit"],
+      "properties": {
+        "kind": { "enum": ["SLOT", "DISTINCT_ATTEMPTS", "DISTINCT_CANONICAL_COURSES", "CREDITS", "ASSIGNMENTS", "NESTED_SATISFACTION"] },
+        "unit": { "enum": ["SLOTS", "COURSES", "CREDIT_UNITS", "ASSIGNMENTS", "BOOLEAN_CHILDREN"] },
+        "fixed_credit_units": { "$ref": "#/$defs/creditUnits" }
+      }
+    },
+    "selector": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["kind", "predicate"], "properties": { "kind": { "const": "PREDICATE" }, "predicate": { "$ref": "#/$defs/predicate" } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "canonical_course_ids"], "properties": { "kind": { "const": "COURSE_LIST" }, "canonical_course_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "child_ids"], "properties": { "kind": { "const": "CHILD_REQUIREMENTS" }, "child_ids": { "type": "array", "items": { "$ref": "#/$defs/qualifiedId" }, "uniqueItems": true } } }
+      ]
+    },
+    "fieldRef": {
+      "type": "object", "additionalProperties": false, "required": ["target", "field", "type"],
+      "properties": {
+        "target": { "enum": ["CATALOG_COURSE", "OFFERING", "TRANSCRIPT_ATTEMPT", "STUDENT_PROFILE"] },
+        "field": { "$ref": "#/$defs/authorId" },
+        "type": { "enum": ["BOOLEAN", "INTEGER", "CREDIT", "STRING", "ENUM", "GRADE", "COURSE_CODE", "CANONICAL_COURSE_ID", "TERM", "SET"] },
+        "course_code_match": { "enum": ["CANONICAL", "ENROLLED_AS", "EITHER"] }
+      }
+    },
+    "literal": { "type": ["string", "integer", "boolean", "null"] },
+    "predicate": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["kind", "field", "operator", "value"], "properties": { "kind": { "const": "COMPARE" }, "field": { "$ref": "#/$defs/fieldRef" }, "operator": { "enum": ["EQ", "NE", "LT", "LE", "GT", "GE", "IN", "CONTAINS", "OVERLAPS"] }, "value": { "oneOf": [{ "$ref": "#/$defs/literal" }, { "type": "array", "items": { "$ref": "#/$defs/literal" } }] } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "field"], "properties": { "kind": { "enum": ["IS_NULL", "IS_UNKNOWN"] }, "field": { "$ref": "#/$defs/fieldRef" } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "operands"], "properties": { "kind": { "enum": ["AND", "OR"] }, "operands": { "type": "array", "items": { "$ref": "#/$defs/predicate" }, "minItems": 1 } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "operand"], "properties": { "kind": { "const": "NOT" }, "operand": { "$ref": "#/$defs/predicate" } } }
+      ]
+    },
+    "requirement": {
+      "type": "object", "additionalProperties": false,
+      "required": ["meta", "roles", "obligation", "active_when", "contribution", "lower", "upper", "selector", "children", "constraint_ids"],
+      "properties": {
+        "meta": { "$ref": "#/$defs/metadata" }, "roles": { "type": "array", "items": { "$ref": "#/$defs/authorId" }, "uniqueItems": true },
+        "obligation": { "enum": ["REQUIRED", "OPTIONAL", "ADVISORY"] }, "active_when": { "$ref": "#/$defs/condition" },
+        "contribution": { "$ref": "#/$defs/contribution" }, "lower": { "$ref": "#/$defs/bound" }, "upper": { "oneOf": [{ "$ref": "#/$defs/bound" }, { "type": "null" }] },
+        "selector": { "$ref": "#/$defs/selector" }, "children": { "type": "array", "items": { "$ref": "#/$defs/requirement" } },
+        "constraint_ids": { "type": "array", "items": { "$ref": "#/$defs/qualifiedId" }, "uniqueItems": true }
+      }
+    },
+    "scope": {
+      "type": "object", "additionalProperties": false, "required": ["kind"],
+      "properties": {
+        "kind": { "enum": ["DIRECT", "SUBTREE", "REQUIREMENTS", "ROLES", "ACTIVE_BRANCH", "PROGRAM"] },
+        "requirement_id": { "$ref": "#/$defs/qualifiedId" }, "requirement_ids": { "type": "array", "items": { "$ref": "#/$defs/qualifiedId" }, "uniqueItems": true },
+        "roles": { "type": "array", "items": { "$ref": "#/$defs/authorId" }, "uniqueItems": true }, "choice_id": { "$ref": "#/$defs/qualifiedId" }, "branch": { "type": "string" }
+      }
+    },
+    "constraintBase": {
+      "type": "object", "additionalProperties": false, "required": ["meta", "kind", "scope"],
+      "properties": { "meta": { "$ref": "#/$defs/metadata" }, "kind": { "type": "string" }, "scope": { "$ref": "#/$defs/scope" } }
+    },
+    "constraint": {
+      "oneOf": [
+        { "$ref": "#/$defs/selectedSetConstraint" }, { "$ref": "#/$defs/groupConstraint" }, { "$ref": "#/$defs/limitConstraint" },
+        { "$ref": "#/$defs/totalConstraint" }, { "$ref": "#/$defs/repeatConstraint" }, { "$ref": "#/$defs/orderingConstraint" }
+      ]
+    },
+    "selectedSetConstraint": {
+      "type": "object", "additionalProperties": false, "required": ["meta", "kind", "active_when", "scope", "comparison", "amount", "unit", "predicate"],
+      "properties": { "meta": { "$ref": "#/$defs/metadata" }, "kind": { "const": "SELECTED_SET" }, "active_when": { "$ref": "#/$defs/condition" }, "scope": { "$ref": "#/$defs/scope" }, "comparison": { "enum": ["AT_LEAST", "AT_MOST", "EXACTLY", "ALL"] }, "amount": { "type": "integer", "minimum": 0 }, "unit": { "enum": ["ATTEMPTS", "CANONICAL_COURSES", "CREDIT_UNITS"] }, "predicate": { "$ref": "#/$defs/predicate" } }
+    },
+    "groupConstraint": {
+      "type": "object", "additionalProperties": false, "required": ["meta", "kind", "active_when", "scope", "mode", "field", "amount"],
+      "properties": { "meta": { "$ref": "#/$defs/metadata" }, "kind": { "const": "GROUP" }, "active_when": { "$ref": "#/$defs/condition" }, "scope": { "$ref": "#/$defs/scope" }, "mode": { "enum": ["DISTINCT_AT_LEAST", "DISTINCT_EXACTLY", "SAME", "MAX_PER_GROUP", "MIN_PER_GROUP"] }, "field": { "$ref": "#/$defs/fieldRef" }, "amount": { "type": "integer", "minimum": 0 } }
+    },
+    "limitConstraint": {
+      "type": "object", "additionalProperties": false, "required": ["meta", "kind", "active_when", "scope", "maximum", "unit", "predicate"],
+      "properties": { "meta": { "$ref": "#/$defs/metadata" }, "kind": { "const": "LIMIT" }, "active_when": { "$ref": "#/$defs/condition" }, "scope": { "$ref": "#/$defs/scope" }, "maximum": { "type": "integer", "minimum": 0 }, "unit": { "enum": ["ATTEMPTS", "CANONICAL_COURSES", "CREDIT_UNITS", "ASSIGNMENTS"] }, "predicate": { "$ref": "#/$defs/predicate" } }
+    },
+    "totalConstraint": {
+      "type": "object", "additionalProperties": false, "required": ["meta", "kind", "active_when", "scope", "minimum", "count"],
+      "properties": { "meta": { "$ref": "#/$defs/metadata" }, "kind": { "const": "TOTAL" }, "active_when": { "$ref": "#/$defs/condition" }, "scope": { "$ref": "#/$defs/scope" }, "minimum": { "type": "integer", "minimum": 0 }, "count": { "enum": ["DISTINCT_ATTEMPTS", "DISTINCT_CANONICAL_COURSES", "CREDIT_UNITS", "ASSIGNMENTS"] }, "predicate": { "$ref": "#/$defs/predicate" } }
+    },
+    "repeatConstraint": {
+      "type": "object", "additionalProperties": false, "required": ["meta", "kind", "active_when", "scope", "maximum_attempts", "predicate"],
+      "properties": { "meta": { "$ref": "#/$defs/metadata" }, "kind": { "const": "REPEAT" }, "active_when": { "$ref": "#/$defs/condition" }, "scope": { "$ref": "#/$defs/scope" }, "maximum_attempts": { "type": "integer", "minimum": 1 }, "predicate": { "$ref": "#/$defs/predicate" } }
+    },
+    "orderingConstraint": {
+      "type": "object", "additionalProperties": false, "required": ["meta", "kind", "active_when", "scope", "before", "after", "strict"],
+      "properties": { "meta": { "$ref": "#/$defs/metadata" }, "kind": { "const": "ORDERING" }, "active_when": { "$ref": "#/$defs/condition" }, "scope": { "$ref": "#/$defs/scope" }, "before": { "$ref": "#/$defs/predicate" }, "after": { "$ref": "#/$defs/predicate" }, "strict": { "const": true } }
+    },
+    "sharingRule": {
+      "type": "object", "additionalProperties": false, "required": ["meta", "active_when", "mode", "requirement_ids"],
+      "properties": { "meta": { "$ref": "#/$defs/metadata" }, "active_when": { "$ref": "#/$defs/condition" }, "mode": { "enum": ["EXCLUSIVE", "SHARE"] }, "requirement_ids": { "type": "array", "items": { "$ref": "#/$defs/qualifiedId" }, "minItems": 2, "uniqueItems": true } }
+    },
+    "choice": {
+      "type": "object", "additionalProperties": false, "required": ["meta", "owner", "value_type", "alternatives"],
+      "properties": { "meta": { "$ref": "#/$defs/metadata" }, "owner": { "enum": ["DECLARED", "SOLVER", "FACT", "PLANNING"] }, "value_type": { "enum": ["STRING", "INTEGER", "BOOLEAN"] }, "alternatives": { "type": "array", "items": { "type": ["string", "integer", "boolean"] }, "minItems": 2, "uniqueItems": true }, "fact_id": { "$ref": "#/$defs/qualifiedId" } }
+    },
+    "factDeclaration": {
+      "type": "object", "additionalProperties": false, "required": ["meta", "fact_type", "parameters"],
+      "properties": { "meta": { "$ref": "#/$defs/metadata" }, "fact_type": { "type": "string", "minLength": 1 }, "parameters": { "type": "object" }, "approval": { "type": "boolean", "default": false } }
+    },
+    "effect": {
+      "type": "object", "additionalProperties": false, "required": ["meta", "when", "kind", "target_id"],
+      "properties": {
+        "meta": { "$ref": "#/$defs/metadata" }, "when": { "$ref": "#/$defs/condition" },
+        "kind": { "enum": ["SET_ACTIVE", "REPLACE_BOUND", "WAIVE", "SUBSTITUTE_NODE", "ADD_OBLIGATION", "PERMIT_ASSIGNMENT"] },
+        "target_id": { "$ref": "#/$defs/qualifiedId" }, "active": { "type": "boolean" }, "bound": { "enum": ["LOWER", "UPPER"] },
+        "value": { "type": "integer", "minimum": 0 }, "replacement_id": { "$ref": "#/$defs/qualifiedId" }, "obligation": { "enum": ["REQUIRED", "OPTIONAL", "ADVISORY"] },
+        "predicate": { "$ref": "#/$defs/predicate" }
+      }
+    },
+    "migration": {
+      "type": "object", "additionalProperties": false, "required": ["from_version", "operations"],
+      "properties": { "from_version": { "const": "0.1.12" }, "operations": { "type": "array", "items": { "type": "object" } } }
+    }
+  }
+}

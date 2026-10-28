@@ -1,7 +1,11 @@
 [package]
 name = "major-requirement-parser-cli"
-version = "0.1.8"
+version = "0.2.0"
 edition = "2024"
+description = "Command-line parser and semantic IR validator for MQL"
+repository = "https://github.com/mrodz/major-requirement-parser"
+readme = "../README.md"
+publish = false
 default-run = "mql"
 
 [[bin]]
@@ -12,3 +16,4 @@ path = "src/main.rs"
 anyhow = "1.0.100"
 clap = { version = "4.5.51", features = ["derive"] }
 libmql = { path = "../libmql" }
+serde_json = "1.0.145"

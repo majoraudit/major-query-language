@@ -1,0 +1,535 @@
+AT Not Academic Elective
+Bin 1 Urban Spatial A &amp; P
+Bin 2 Urban Env Resource Mgmt
+Bin 4 Cities and Civil Soc
+DI Additional Bible Course
+DI Area I
+DI Area II
+DI Area III
+DI Area IV
+DI Area V
+DI BRAD
+DI Cert CongregationalMinistry
+DI Choir
+DI Church History
+DI Clin Pastoral Education
+DI Diversity
+DI Ethics
+DI Field Related
+DI Global Christianity
+DI Hebrew Bible
+DI History
+DI Homiletics
+DI Internship or CPE
+DI Internship or CPE
+DI Latin(x) Am Christianity
+DI Leadership or Religious Edu
+DI Lived Religion Beyond
+DI New Testament
+DI Non-Christian Religions
+DI Permission Required
+DI Preaching or Public Address
+DI Preventing Min Misconduct
+DI Put on Course List
+DI Religion and Ecology
+DI Religion and the Arts
+DI Theology
+DI Theology,Ethics,Philosophy
+DI WGSS
+DI WGSS
+DI World Christianity/Mission
+GB Core
+GB Cross-School Cross-Listed
+GB Elective
+GB First-Half-Term Course
+GB Prog. Eval. Cert.
+GB SAT-UNSAT
+GB Second-Half-Term Course
+GB Sub GLBL 5020
+GS HIST Ancient
+GS HIST Early Modern
+GS HIST Medieval
+GS HIST Modern
+GS HIST Research Seminar
+GS MHHR Elective
+GS PHIL Formal Methods
+GS PHIL Grp1 Metaphysics etc.
+GS PHIL Grp2 Ethics etc.
+GS PHIL Grp3 HistOfPhilosophy
+GS PTB Biostatistics
+GS S&amp;DS Data Analysis (MA)
+GS S&amp;DS EffcntComputn&amp;BigData
+GS S&amp;DS Methods of Data Sci
+GS S&amp;DS Probability
+GS S&amp;DS Statistical Theory
+GS SLAV 18th Century
+GS SLAV 19th Century
+GS SLAV 20th Century
+GS SLAV Pre-18th Century
+Hybrid; in-person &amp; remote
+MU Category A
+MU Category A or B
+MU Category B
+MU Category B or C
+MU Category C
+MU Non-Performance
+MU Performance
+NR Adult Gero Acute Care
+NR Adult Gero Primary Care
+NR DNP Clinical track
+NR DNP Leadership track
+NR Dual Spec, Midwifery WH
+NR Family Nurse Practitioner
+NR GEPN, pre-spec in nursing
+NR Nurse Midwifery
+NR Pediatric NP Acute Care
+NR Pediatric NP Primary Care
+NR Psych Mental Hlth Spec
+NR Women’s Health
+PH Applied Practicum Exp
+PH CCH Research&amp;AppliedSkills
+PH CCH Soc&amp;Envrnmntl Drivers
+PH Climate Change and Health
+PH Environmental Hlth Science
+PH Glbl Hlth Biomedicine
+PH Glbl Hlth Devlpmt/PolEcon
+PH Glbl Hlth Epidemiology
+PH Glbl Hlth Ethics/Hist/Hums
+PH Glbl Hlth Implement Sci
+PH Glbl Hlth Social&amp;Behavior
+PH Integrated Learning Exp
+PH Public Health Modeling
+SOM MMS Asset Management Elct
+SOM MMS GlblBsness&amp;Sciety Elct
+SOM MMS Systemic Risk Elct
+SOM Technology Management Elct
+SOM Technology Management Req.
+SU Art History Program
+SU English Lang 5 week
+SU FGLI Scholars
+SU Journalism Program
+SU Norfolk School of Art
+SU Politics Program
+SU Prison Education Initiative
+SU Yale Writers’ Workshop
+SU Yale Young Writers Workshop
+Taught in-person
+Taught remotely
+YC AMST Cultural Hist/Studies
+YC AMST Early Americas
+YC AMST First-Year Sem
+YC AMST Gateway Courses
+YC AMST Junior Seminars
+YC AMST Senior Seminars
+YC AMST Special&amp;Sr Projects
+YC AMST Survey of Am Lit
+YC ANTH Adv Lab/Data Analysis
+YC ANTH Archaeology
+YC ANTH Biological
+YC ANTH Linguistic
+YC ANTH Medical
+YC ANTH Sociocultural
+YC ANTH Theory
+YC ARCG Advanced Lab
+YC ARCG Intro Survey
+YC ARCG Theory
+YC ARCH History &amp; Theory
+YC ARCH Materials &amp; Design
+YC ARCH Urbanism &amp; Landscape
+YC ARCHStructures&amp;Computation
+YC ASTR Sci/Math Elective BA
+YC BENG Bioimaging
+YC BENG Biomchncs&amp;Mchnbiology
+YC BENG Biomolecular Engrng
+YC BENG Systems Biology
+YC CGSC Skills
+YC CHEM Advanced Courses
+YC CHEM GR of Interest to UG
+YC CHEM Intermediate Courses
+YC CHEM Introductory Courses
+YC CHEM Nonmajor w/o Prereq
+YC Climate Anthropogenic
+YC Climate Basic Climate Sci
+YC Climate Non-science
+YC Climate Sci/Eng/Tech
+YC Climate Sci/Solutions Sem
+YC Climate Solutions
+YC CLSS Ancient Hist Greece
+YC CLSS Ancient Hist Rome
+YC CLSS Hist, Phil, Art, Arcg
+YC CLSS Lit/Cult Anc Greece
+YC CLSS Lit/Cult Anc Rome
+YC Collections Engagement
+YC Collections Research
+YC Collections Society
+YC College Seminar
+YC Courses Offered After Registration Closed
+YC CPAR ARCH CS Elective
+YC CPAR ART CS Elective
+YC CPAR HSAR CS Elective
+YC CPAR MUSI Addl Course
+YC CPAR MUSI CS Elective
+YC CPAR THST CS Elective
+YC CPLI Elective in CP &amp; Ling
+YC CPLT 19th Century
+YC CPLT 20th &amp; 21st Centuries
+YC CPLT Antiquity
+YC CPLT Early Modern
+YC CPLT Film
+YC CPLT Medieval
+YC CPLT Theory
+YC CPLT Translation Studies
+YC CPSC Elective
+YC CPSC&amp;MATH Adv CS Elective
+YC CSEC Elctv intrsectn CS/EC
+YC CSEC Elective not CS or EC
+YC CSOC Hist, Media, Culture
+YC CSOC Intersections
+YC CSOC Introduction
+YC CSOC Rsrch, Pltc, Law, Econ
+YC Data Science Connector
+YC DataSci ComputMachineLrning
+YC DataSci DataAnalyDiscArea
+YC E&amp;EB BS Elective
+YC E&amp;EB Intermediate/Advanced
+YC E&amp;EB Introductory Courses
+YC E&amp;EB Organismal Lec/Labs
+YC E&amp;EB Prereq Option
+YC ECON Core
+YC ECON Development
+YC ECON EconData
+YC ECON Education
+YC ECON Environment
+YC ECON Finance
+YC ECON Health
+YC ECON History
+YC ECON Industrial Orgnztion
+YC ECON International
+YC ECON Introductory
+YC ECON Labor
+YC ECON Law
+YC ECON Macroeconomics
+YC ECON Methodology
+YC ECON Microtheory
+YC ECON Neuro
+YC ECON Political Economy
+YC ECON Poverty
+YC ECON Public
+YC ECON Theory Seminar
+YC EDST Individuals in Society
+YC EDST Pedagogy
+YC EDST Policy
+YC EDST Social Context
+YC EDST Theory &amp; Research
+YC ENGL 18th/19th Century
+YC ENGL 20th/21st Century
+YC ENGL American Lit
+YC ENGL Creative Writing
+YC ENGL Junior Seminar
+YC ENGL Medieval
+YC ENGL Pre-1800 Lit
+YC ENGL Pre-1900 Lit
+YC ENGL Renaissance
+YC ENGL Senior Seminar
+YC ENRG Energy &amp; Environment
+YC ENRG Energy &amp; Society
+YC ENRG Energy Science &amp; Tech
+YC EP&amp;E Advanced Seminar
+YC EP&amp;E Economics Core
+YC EP&amp;E Ethics Core
+YC EP&amp;E Intro Econometrics
+YC EP&amp;E Intro Ethics
+YC EP&amp;E Intro Game Theory
+YC EP&amp;E Intro Microeconomics
+YC EP&amp;E Intro Political Phil
+YC EP&amp;E Intro Statistics
+YC EP&amp;E Politics Core
+YC ER&amp;M Elec Within the Major
+YC ER&amp;M Methods Course
+YC ER&amp;M Required Courses
+YC ER&amp;M Research &amp; Sr Essay
+YC Ethnography Elective
+YC Ethnography Methods
+YC EVST Advanced Seminar
+YC EVST BA QR Methods
+YC EVST BS Natural Sci Lab
+YC EVST Core BA Climate Sci
+YC EVST Core BA Life Sci
+YC EVST Core BA Natural Scie
+YC EVST Core BA Physical Sci
+YC EVST Core BS Natural Sci
+YC EVST Core Human/Social Sci
+YC EVST Core Humanities
+YC EVST Core Social Sci
+YC FILM Critical Studies
+YC FILM Production
+YC FILM World Cinema
+YC Food Consumption
+YC Food Environment
+YC Food Production
+YC FREN Pre-1800
+YC FREN Taught in English
+YC FREN Taught in French
+YC GLBL 121 Alternative Course
+YC GLBL Addtl Methods Course
+YC GLBL Elective
+YC GLBL Qualitative Methods
+YC GLBL Security
+YC GLBL Senior Fellow Elective
+YC GLHTH Bio &amp; Env Influences
+YC GLHTH Health &amp; Societies
+YC GLHTH Hist Approaches
+YC GLHTH Perf, Rep &amp; Health
+YC GLHTH Polit Econ &amp; Govern
+YC GLHTH Quantitative Data
+YC GMAN Aesthetics &amp; Arts
+YC GMAN Critical Thought
+YC GMAN History &amp; Politics
+YC GMAN Literature
+YC GMAN Media &amp; Media Theory
+YC HIST Africa
+YC HIST Asia
+YC HIST Cultural History
+YC HIST Departmental Seminars
+YC HIST Empires &amp; Colonialism
+YC HIST Environmental History
+YC HIST Europe
+YC HIST First-Year Seminars
+YC HIST Ideas &amp; Intellectuals
+YC HIST Intl &amp; Diplomat Hist
+YC HIST Latin America
+YC HIST Lecture Courses
+YC HIST Middle East
+YC HIST Pltcs, Law &amp; Govt
+YC HIST Preindustrial
+YC HIST Race Gender&amp;Sexuality
+YC HIST Religion in Context
+YC HIST Sci, Tech, &amp; Medicine
+YC HIST Senior Essay
+YC HIST Soc Chng&amp;Social Mvmnt
+YC HIST The World Economy
+YC HIST United States
+YC HIST War &amp; Society
+YC HIST World
+YC HIST Writing Tutorial
+YC HSAR 1400-1800
+YC HSAR 1500-1800
+YC HSAR 800-1400
+YC HSAR 800-1500
+YC HSAR Africa &amp; Pacific
+YC HSAR Asia &amp; Near East
+YC HSAR Europe
+YC HSAR Post-1800
+YC HSAR Pre-800
+YC HSAR The Americas
+YC HSAR Transchronological
+YC HSAR Transregional
+YC HSHM Colonial Know &amp; Power
+YC HSHM Environ &amp; Society
+YC HSHM Gender, Reprod &amp; Body
+YC HSHM Med &amp; Public Health
+YC HSHM Media Info &amp; Public
+YC HSHM Minds and Brains
+YC HSHM Sci, Tech &amp; Society
+YC Human Rights Domestic
+YC Human Rights Gateway
+YC Human Rights International
+YC HUMS Area Arts
+YC HUMS Area History
+YC HUMS Area Literature
+YC HUMS Area Science
+YC HUMS CoreSem Interpretation
+YC HUMS CoreSem Modernities
+YC HUMS CoreSem Traditions
+YC HUMS Foundtns AnyTradition
+YC HUMS Foundtns WesternEurope
+YC Islamic Stud Art Arch Lit
+YC Islamic Stud History
+YC Islamic Stud Religion
+YC Islamic Stud Society
+YC ITAL Taught in English
+YC ITAL Taught in Italian
+YC LING Adv Courses/Seminars
+YC LING American Sign Courses
+YC LING Brdth Comp Ling
+YC LING Brdth Historical Ling
+YC LING Brdth Lang&amp;Mind/Brain
+YC LING Brdth Morphology
+YC LING Brdth Phonetics
+YC LING Brdth Semntcs/Pragmat
+YC LING Breadth
+YC LING Depth
+YC LING Depth Comp Linguistic
+YC LING Depth Historical Ling
+YC LING Depth Lang&amp;Mind/Brain
+YC LING Depth Morphology
+YC LING Depth Phonetics
+YC LING Depth Phonology
+YC LING Depth Semntcs/Pragmat
+YC LING Depth Syntax
+YC LING Elective
+YC LING Intermediate Courses
+YC LING Introductory Courses
+YC LING Res Courses/Sr Essay
+YC MATH Algebra/Number Theory
+YC MATH Analysis
+YC MATH Core Algebra
+YC MATH Core Complex Analysis
+YC MATH Core Real Analysis
+YC MATH Distribution
+YC MATH Geometry/Topology
+YC MATH Logic/Foundations
+YC MATH Stat/Applied Math
+YC MATH&amp;PHIL Logic Component
+YC MDVL East &amp; SE Asia
+YC MDVL Eur Russ &amp; N Atlantic
+YC MDVL Nr East &amp; N Africa
+YC MDVL Other MDVL Topics
+YC MDVL S &amp; Central Asia
+YC MENG BS Technical Elective
+YC MENG Eng Sci-Mech Crse
+YC MMES Adv Seminar
+YC MMES Distribution Course
+YC MMES Survey Course
+YC MUSI Advanced Grp I
+YC MUSI Advanced Grp II
+YC MUSI Advanced Grp III
+YC MUSI Advanced Grp IV
+YC MUSI Intermediate Grp I
+YC MUSI Intermediate Grp II
+YC MUSI Intermediate Grp III
+YC MUSI Intermediate Grp IV
+YC NAIS Environment &amp; Politics
+YC NAIS History Society &amp; Law
+YC NAIS Language &amp; Culture
+YC NAIS Literature &amp; Arts
+YC NAIS Science &amp; Education
+YC NELC Ancient Near East
+YC NELC Foundations Course
+YC NELC Medieval Near East
+YC NELC Modern Middle East
+YC Not Taught In Target Language
+YC NSCI Basic Allied Core
+YC NSCI Computational
+YC NSCI Molecular/Cell/Biol
+YC NSCI Neuroscience Lab
+YC NSCI Other Allied
+YC NSCI Quantitative
+YC NSCI Statistics Prereq
+YC NSCI Systems/Circuit/Behav
+YC Persia &amp; Iran Content
+YC PHIL Ethics &amp; Value Theory
+YC PHIL History of Philosophy
+YC PHIL Intersctn PSYC/PHIL
+YC PHIL Logic
+YC PHIL Metaphysics&amp;Epistemol
+YC PLSC American Govt
+YC PLSC Comparative Govt
+YC PLSC Core Lecture
+YC PLSC Internatl Relations
+YC PLSC Intro Courses
+YC PLSC Method &amp;Formal Theory
+YC PLSC Political Philosophy
+YC PLSC Sr Essay/Dir Read
+YC Preference Selection Req'd
+YC Prog Advanced Programming
+YC Prog Applctions/Algorithms
+YC Prog Data Structures
+YC Prog Programming
+YC Prog Programming Elective
+YC PSYC Natural Science
+YC PSYC Natural Science Core
+YC PSYC NSCI Track Adv Scie
+YC PSYC NSCI Track RsrchMthds
+YC PSYC NSCI Track Senior Sem
+YC PSYC Social Science
+YC PSYC Social Science Core
+YC Quantum Elective
+YC S&amp;DS Methods Data Science
+YC SAST Premodern South Asia
+YC SOCY Economy &amp; Sociology
+YC SOCY Health &amp; Society
+YC SOCY InequalityRaceSociety
+YC SOCY Sociological Methods
+YC Sophomore Seminar
+YC SPAN Taught in Spanish
+YC TDPS Artistic Practice
+YC TDPS Elective
+YC TDPS Histories
+YC TDPS Interarts
+YC TDPS Performance Theory
+YC TECH Design
+YC TECH Organization Planning
+YC URBN Elective
+YC URBN Methods Course
+YC URBN Survey Course
+YC URBN Urban Lab
+YSE Capstone
+YSE CC Biophysical Science
+YSE CC Policy, Law, Economics
+YSE CC Society &amp; Humanities
+YSE CC StrategiesToolsPathways
+YSE Master's Thesis Project
+YSE MEM B&amp;E Core
+YSE MEM B&amp;E Electives
+YSE MEM B&amp;E Finance
+YSE MEM B&amp;E Quantitative
+YSE MEM C&amp;A Core
+YSE MEM C&amp;A Electives
+YSE MEM C&amp;A Seminars
+YSE MEM E&amp;E Climate, Health
+YSE MEM E&amp;E Core
+YSE MEM E&amp;E Energy &amp; Society
+YSE MEM E&amp;E Interdisciplinary
+YSE MEM E&amp;E Policy, Governance
+YSE MEM E&amp;E Quant Methods
+YSE MEM E&amp;E Tech &amp; Industries
+YSE MEM ELCM Core
+YSE MEM ELCM Mgmt &amp; Policy
+YSE MEM ELCM Quantitative
+YSE MEM ELCM Sci Princ 1
+YSE MEM ELCM Sci Princ 2
+YSE MEM EP&amp;A Core
+YSE MEM EP&amp;A Econ &amp; Quant
+YSE MEM EP&amp;A Law &amp; Governance
+YSE MEM IEGC Add'l Electives
+YSE MEM IEGC Core
+YSE MEM IEGC Primary Electives
+YSE MEM N&amp;S Conservation Sci
+YSE MEM N&amp;S Core
+YSE MEM N&amp;S Humanities
+YSE MEM N&amp;S Social Science
+YSE MEM P2 Core A
+YSE MEM P2 Core B
+YSE MEM Policy Core 2
+YSE MEM Urban Cities&amp;CivilScty
+YSE MEM Urban Core
+YSE MEM Urban Env Resource Mgt
+YSE MEM Urban Land &amp; Built Env
+YSE MEM Urban Spatial Analysis
+YSE MEM WRSM Core
+YSE MEM WRSM Management
+YSE MEM WRSM Mthds Tools Quant
+YSE MEM WRSM Science
+YSE MF Biometeorology
+YSE MF Capstone
+YSE MF Economics
+YSE MF Ecosystem, Comm Ecology
+YSE MF Field Trips
+YSE MF Forest Ecology Dynamics
+YSE MF Forest Health
+YSE MF GIS
+YSE MF Hydrology
+YSE MF Leadership
+YSE MF Measurement
+YSE MF Mgmt Forest Resources
+YSE MF Policy Science &amp; Law
+YSE MF Professional Knowledge
+YSE MF Silviculture
+YSE MF Soc &amp; Polit Ecol, Anth
+YSE MF Soils &amp; Geology
+YSE NF Tree Phys, Morph, Taxon
+YSM MHS AdvHlthSciRsrch Elct
+YSM MHS Clinical Invstgtn Elct
+YSM MHS Clinical&amp;DataSci Elct
+YSM MHS Medical Education Elct

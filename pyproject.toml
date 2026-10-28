@@ -4,13 +4,24 @@ build-backend = "maturin"
 
 [project]
 name = "pylibmql"
+description = "Major Query Language parser and versioned semantic IR validator"
+readme = "README.md"
 requires-python = ">=3.8"
+keywords = ["degree-audit", "mql", "parser", "semantic-ir", "yale"]
 classifiers = [
+    "Development Status :: 3 - Alpha",
     "Programming Language :: Rust",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: Implementation :: CPython",
-    "Programming Language :: Python :: Implementation :: PyPy",
+    "Typing :: Typed",
 ]
 dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/mrodz/major-requirement-parser"
+Repository = "https://github.com/mrodz/major-requirement-parser"
+Issues = "https://github.com/mrodz/major-requirement-parser/issues"
 
 [tool.maturin]
 features = ["pyo3/extension-module"]

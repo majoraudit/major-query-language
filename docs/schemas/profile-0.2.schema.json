@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mql.dev/schema/0.2/profile.json",
+  "title": "MQL Student Profile Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "student_id", "declared_choices", "facts"],
+  "properties": {
+    "schema_version": { "const": "0.2.0" }, "student_id": { "type": "string" },
+    "declared_choices": { "type": "object", "additionalProperties": { "type": ["string", "integer", "boolean"] } },
+    "facts": { "type": "array", "items": { "$ref": "#/$defs/fact" } }, "class_year": { "type": ["integer", "null"] }
+  },
+  "$defs": {
+    "fact": {
+      "type": "object", "additionalProperties": false, "required": ["fact_id", "fact_type", "parameters", "witness"],
+      "properties": { "fact_id": { "type": "string" }, "fact_type": { "type": "string" }, "parameters": { "type": "object" }, "witness": { "type": "object" } }
+    }
+  }
+}

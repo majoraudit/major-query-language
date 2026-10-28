@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mql.dev/schema/0.2/transcript.json",
+  "title": "MQL Transcript Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "credit_scale", "attempts"],
+  "properties": {
+    "schema_version": { "const": "0.2.0" }, "credit_scale": { "type": "integer", "minimum": 1 },
+    "attempts": { "type": "array", "items": { "$ref": "#/$defs/attempt" } }
+  },
+  "$defs": {
+    "attempt": {
+      "type": "object", "additionalProperties": true,
+      "required": ["attempt_id", "canonical_course_id", "enrolled_under_code", "term", "academic_level", "grade", "grading_mode", "earned_credit_units", "source", "credit_bearing"],
+      "properties": {
+        "attempt_id": { "type": "string" }, "canonical_course_id": { "type": "string" }, "enrolled_under_code": { "type": "string" }, "term": { "type": "string" },
+        "academic_level": { "type": "string" }, "grade": { "type": ["string", "null"] }, "grading_mode": { "type": "string" },
+        "earned_credit_units": { "type": "integer", "minimum": 0 }, "source": { "type": "string" }, "credit_bearing": { "type": "boolean" }
+      }
+    }
+  }
+}

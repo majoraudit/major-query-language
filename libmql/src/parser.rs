@@ -5,7 +5,9 @@ use serde::Serialize;
 use std::collections::HashMap;
 
 use crate::{
-    VERSION, closest_string::closest_string, yale_departments::{closest_department, is_department}
+    LEGACY_LANGUAGE_VERSION,
+    closest_string::closest_string,
+    yale_departments::{closest_department, is_department},
 };
 
 #[derive(Parser)]
@@ -52,7 +54,7 @@ pub enum Selector {
     Tag(String),
     TagCode {
         tag: String,
-        code: String
+        code: String,
     },
     Dist(String),
     DistCode {
@@ -61,17 +63,17 @@ pub enum Selector {
     },
     Range {
         from: Class,
-        to: Class
+        to: Class,
     },
     RangeDist {
         from: Class,
         to: Class,
-        dist: String
+        dist: String,
     },
     RangeTag {
         from: Class,
         to: Class,
-        tag: String
+        tag: String,
     },
     Query(MQLQuery),
 }
@@ -248,17 +250,16 @@ impl MQLParser {
                 let span = inner.as_span();
                 match vars.get(name) {
                     Some(VarValue::Quantity(q)) => {
-                        if top_level {
-                            if let Quantity::Many { from, .. } = q {
-                                if *from == 0 {
-                                    bail_with_span!(
-                                        span,
-                                        "cannot select a range starting from zero on a top-level SELECT"
-                                    );
-                                }
-                            }
+                        if top_level
+                            && let Quantity::Many { from, .. } = q
+                            && *from == 0
+                        {
+                            bail_with_span!(
+                                span,
+                                "cannot select a range starting from zero on a top-level SELECT"
+                            );
                         }
-                        Ok(q.clone())
+                        Ok(*q)
                     }
                     Some(v) => bail_with_span!(
                         span,
@@ -268,7 +269,9 @@ impl MQLParser {
                     None => bail_with_span!(span, "undefined variable `{name}`"),
                 }
             }
-            rule => unreachable!("should have {{ quantity_many | quantity_single | variable }}, got {rule:?}"),
+            rule => unreachable!(
+                "should have {{ quantity_many | quantity_single | variable }}, got {rule:?}"
+            ),
         }
     }
 
@@ -356,7 +359,9 @@ impl MQLParser {
                     None => bail_with_span!(span, "undefined variable `{name}`"),
                 }
             }
-            rule => unreachable!("should have {{ string | class_argument | variable }}, got {rule:?}"),
+            rule => {
+                unreachable!("should have {{ string | class_argument | variable }}, got {rule:?}")
+            }
         }
     }
 
@@ -415,7 +420,10 @@ impl MQLParser {
                         "RANGE function must take two <CLASS>, <CLASS> arguments of the form `DEPARTMENT_ID CLASS_ID`"
                     )
                 };
-                Selector::Range { from: class_start.clone(), to: class_end.clone() }
+                Selector::Range {
+                    from: class_start.clone(),
+                    to: class_end.clone(),
+                }
             }
             Rule::tag_dept => {
                 let [Argument::String(tag), Argument::String(code)] = args.as_slice() else {
@@ -424,7 +432,10 @@ impl MQLParser {
                         "TAG_DEPT function must take two <STRING>, <STRING> arguments of the form `\"YC TAG\"`, `\"Yale Major Code\"`"
                     )
                 };
-                Selector::TagCode { tag: tag.clone(), code: code.clone() }
+                Selector::TagCode {
+                    tag: tag.clone(),
+                    code: code.clone(),
+                }
             }
             Rule::dist => {
                 let [Argument::String(dist)] = args.as_slice() else {
@@ -442,32 +453,63 @@ impl MQLParser {
                         "DIST_DEPT function must take two <STRING>, <STRING> arguments of the form `\"YC dist\"`, `\"Yale Major Code\"`"
                     )
                 };
-                Selector::DistCode { dist: dist.clone(), code: code.clone() }
+                Selector::DistCode {
+                    dist: dist.clone(),
+                    code: code.clone(),
+                }
             }
             Rule::range_dist => {
-                let [Argument::Class(from), Argument::Class(to), Argument::String(dist)] = args.as_slice() else {
+                let [
+                    Argument::Class(from),
+                    Argument::Class(to),
+                    Argument::String(dist),
+                ] = args.as_slice()
+                else {
                     bail_with_span!(
                         span,
                         "RANGE_DIST function must take three <CLASS>, <CLASS>, <STRING> arguments"
                     )
                 };
 
-                Selector::RangeDist { from: from.clone(), to: to.clone(), dist: dist.clone() }
+                Selector::RangeDist {
+                    from: from.clone(),
+                    to: to.clone(),
+                    dist: dist.clone(),
+                }
             }
             Rule::range_tag => {
-                let [Argument::Class(from), Argument::Class(to), Argument::String(tag)] = args.as_slice() else {
+                let [
+                    Argument::Class(from),
+                    Argument::Class(to),
+                    Argument::String(tag),
+                ] = args.as_slice()
+                else {
                     bail_with_span!(
                         span,
                         "RANGE_TAG function must take three <CLASS>, <CLASS>, <STRING> arguments"
                     )
                 };
 
-                Selector::RangeTag { from: from.clone(), to: to.clone(), tag: tag.clone() }
+                Selector::RangeTag {
+                    from: from.clone(),
+                    to: to.clone(),
+                    tag: tag.clone(),
+                }
             }
             Rule::bad_query => {
                 let potential_misspelling = closest_string(
                     query_name_inner.as_str(),
-                    &["CLASS", "RANGE", "TAG_DEPT", "TAG", "PLACEMENT", "DIST", "DIST_DEPT", "RANGE_DIST", "RANGE_TAG"],
+                    [
+                        "CLASS",
+                        "RANGE",
+                        "TAG_DEPT",
+                        "TAG",
+                        "PLACEMENT",
+                        "DIST",
+                        "DIST_DEPT",
+                        "RANGE_DIST",
+                        "RANGE_TAG",
+                    ],
                 )
                 .unwrap();
 
@@ -484,7 +526,10 @@ impl MQLParser {
 
     // selector_single = { statement | XYZ | variable }
     // Returns Vec<Selector> to allow SelectorList variables to expand in-place.
-    fn parse_selector_single(selector_single: Pair<Rule>, vars: &Variables) -> Result<Vec<Selector>> {
+    fn parse_selector_single(
+        selector_single: Pair<Rule>,
+        vars: &Variables,
+    ) -> Result<Vec<Selector>> {
         assert_eq!(selector_single.as_rule(), Rule::selector_single);
 
         let inner = selector_single
@@ -513,7 +558,9 @@ impl MQLParser {
                     None => bail_with_span!(span, "undefined variable `{name}`"),
                 }
             }
-            rule => unreachable!("should have {{ statement | XYZ | class_argument | variable }}, got {rule:?}"),
+            rule => unreachable!(
+                "should have {{ statement | XYZ | class_argument | variable }}, got {rule:?}"
+            ),
         }
     }
 
@@ -571,28 +618,39 @@ impl MQLParser {
 
         let selector = Self::parse_selector(selector, vars).context("failed parsing selector")?;
 
-        Ok(MQLQuery { quantity, r#type, selector })
+        Ok(MQLQuery {
+            quantity,
+            r#type,
+            selector,
+        })
     }
 
     // var_value = { selector_list | XYZ | quantity_many | quantity_single | string | class_argument }
     pub(crate) fn parse_var_value(var_value: Pair<Rule>, vars: &Variables) -> Result<VarValue> {
         assert_eq!(var_value.as_rule(), Rule::var_value);
 
-        let inner = var_value.into_inner().next().context("expected value in var_value")?;
+        let inner = var_value
+            .into_inner()
+            .next()
+            .context("expected value in var_value")?;
 
         match inner.as_rule() {
-            Rule::selector_list => {
-                Ok(VarValue::SelectorList(Self::parse_selector_list(inner, vars)?))
-            }
-            Rule::XYZ => {
-                Ok(VarValue::Selector(Self::parse_xyz(inner, vars)?))
-            }
+            Rule::selector_list => Ok(VarValue::SelectorList(Self::parse_selector_list(
+                inner, vars,
+            )?)),
+            Rule::XYZ => Ok(VarValue::Selector(Self::parse_xyz(inner, vars)?)),
             Rule::quantity_many => {
                 let mut children = inner.into_inner();
                 let from_node = children.next().unwrap();
-                let from = from_node.as_str().parse::<u16>().context("quantity could not fit as u16")?;
+                let from = from_node
+                    .as_str()
+                    .parse::<u16>()
+                    .context("quantity could not fit as u16")?;
                 let to_node = children.next().unwrap();
-                let to = to_node.as_str().parse::<u16>().context("quantity could not fit as u16")?;
+                let to = to_node
+                    .as_str()
+                    .parse::<u16>()
+                    .context("quantity could not fit as u16")?;
                 if to < from {
                     bail_with_span!(
                         to_node.as_span(),
@@ -602,7 +660,10 @@ impl MQLParser {
                 Ok(VarValue::Quantity(Quantity::Many { from, to }))
             }
             Rule::quantity_single => {
-                let n = inner.as_str().parse::<u16>().context("quantity could not fit as u16")?;
+                let n = inner
+                    .as_str()
+                    .parse::<u16>()
+                    .context("quantity could not fit as u16")?;
                 if n == 0 {
                     bail_with_span!(inner.as_span(), "cannot assign zero as a quantity");
                 }
@@ -614,7 +675,10 @@ impl MQLParser {
         }
     }
 
-    pub fn parse_file(root_pair: Pair<Rule>, externals: HashMap<String, VarValue>) -> Result<MQLQueryFile> {
+    pub fn parse_file(
+        root_pair: Pair<Rule>,
+        externals: HashMap<String, VarValue>,
+    ) -> Result<MQLQueryFile> {
         assert_eq!(root_pair.as_rule(), Rule::file);
 
         let mut requirements = vec![];
@@ -627,13 +691,18 @@ impl MQLParser {
                 Rule::EOI => (),
                 Rule::extern_decl => {
                     // extern_decl = { extern_keyword ~ variable }
-                    let var_pair = child.into_inner().next().context("expected variable in extern_decl")?;
+                    let var_pair = child
+                        .into_inner()
+                        .next()
+                        .context("expected variable in extern_decl")?;
                     assert_eq!(var_pair.as_rule(), Rule::variable);
                     let var_name = var_pair.as_str().to_owned();
                     let span = var_pair.as_span();
 
                     match externals.get(&var_name).cloned() {
-                        Some(value) => { vars.insert(var_name, value); }
+                        Some(value) => {
+                            vars.insert(var_name, value);
+                        }
                         None => bail_with_span!(
                             span,
                             "extern variable `{var_name}` was declared but not provided by the caller"
@@ -647,7 +716,8 @@ impl MQLParser {
                     assert_eq!(var_pair.as_rule(), Rule::variable);
                     let var_name = var_pair.as_str().to_owned();
 
-                    let var_value_pair = inner.next().context("expected var_value in var_assign")?;
+                    let var_value_pair =
+                        inner.next().context("expected var_value in var_assign")?;
                     let value = Self::parse_var_value(var_value_pair, &vars)?;
 
                     vars.insert(var_name, value);
@@ -662,7 +732,9 @@ impl MQLParser {
                         match priority_pair.as_rule() {
                             Rule::quantity_single => {
                                 let as_ascii = priority_pair.as_str();
-                                as_ascii.parse::<u16>().context("selection could not fit as u16")?
+                                as_ascii
+                                    .parse::<u16>()
+                                    .context("selection could not fit as u16")?
                             }
                             Rule::variable => {
                                 let name = priority_pair.as_str();
@@ -712,13 +784,15 @@ impl MQLParser {
                         priority,
                     });
                 }
-                rule => unreachable!("should have {{ SOI ~ extern_decl* ~ (var_assign | special_statement)* ~ EOI }}, got {rule:?}"),
+                rule => unreachable!(
+                    "should have {{ SOI ~ extern_decl* ~ (var_assign | special_statement)* ~ EOI }}, got {rule:?}"
+                ),
             }
         }
 
         Ok(MQLQueryFile {
             requirements,
-            version: VERSION,
+            version: LEGACY_LANGUAGE_VERSION,
         })
     }
 }

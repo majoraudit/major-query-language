@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mql.dev/schema/0.2/institution.json",
+  "title": "MQL Institution Schema Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_id", "version", "normalization", "fields", "enums", "grade_order", "joins", "facts"],
+  "properties": {
+    "schema_id": { "type": "string", "format": "uri-reference" },
+    "version": { "type": "string", "minLength": 1 },
+    "normalization": { "type": "object", "additionalProperties": false, "required": ["strings"], "properties": { "strings": { "enum": ["EXACT", "NFC", "NFC_CASEFOLD"] } } },
+    "fields": { "type": "array", "items": { "$ref": "#/$defs/field" }, "minItems": 1 },
+    "enums": { "type": "object", "additionalProperties": { "type": "array", "items": { "type": "string" }, "uniqueItems": true } },
+    "grade_order": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "joins": { "type": "array", "items": { "$ref": "#/$defs/join" } },
+    "facts": { "type": "array", "items": { "$ref": "#/$defs/factType" } },
+    "department_aliases": { "type": "object", "additionalProperties": { "type": "string" } },
+    "tag_values": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+  },
+  "$defs": {
+    "field": {
+      "type": "object", "additionalProperties": false, "required": ["target", "name", "type", "nullable", "operators"],
+      "properties": {
+        "target": { "enum": ["CATALOG_COURSE", "OFFERING", "TRANSCRIPT_ATTEMPT", "STUDENT_PROFILE"] },
+        "name": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "type": { "enum": ["BOOLEAN", "INTEGER", "CREDIT", "STRING", "ENUM", "GRADE", "COURSE_CODE", "CANONICAL_COURSE_ID", "TERM", "SET"] },
+        "nullable": { "type": "boolean" }, "enum_name": { "type": "string" },
+        "operators": { "type": "array", "items": { "enum": ["EQ", "NE", "LT", "LE", "GT", "GE", "IN", "CONTAINS", "OVERLAPS", "IS_NULL", "IS_UNKNOWN"] }, "uniqueItems": true }
+      }
+    },
+    "join": {
+      "type": "object", "additionalProperties": false, "required": ["from_target", "from_field", "to_target", "to_field"],
+      "properties": { "from_target": { "type": "string" }, "from_field": { "type": "string" }, "to_target": { "type": "string" }, "to_field": { "type": "string" } }
+    },
+    "factType": {
+      "type": "object", "additionalProperties": false, "required": ["name", "approval", "parameters"],
+      "properties": { "name": { "type": "string" }, "approval": { "type": "boolean" }, "parameters": { "type": "object", "additionalProperties": { "type": "string" } } }
+    }
+  }
+}

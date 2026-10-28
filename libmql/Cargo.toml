@@ -1,7 +1,10 @@
 [package]
 name = "libmql"
-version = "0.1.12"
+version = "0.2.0"
 edition = "2024"
+description = "Parser and solver-independent semantic IR for the Major Query Language"
+repository = "https://github.com/mrodz/major-requirement-parser"
+readme = "../README.md"
 
 [dependencies]
 anyhow = "1.0.100"

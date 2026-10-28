@@ -1,65 +1,20 @@
-"""pylibmql.pyi
-
-Transform MQL input to structured JSON output. 
-
-```
-import pylibmql
-    
-output = pylibmql.parse('SELECT 1 FROM CLASS(MATH 2250): "Must take MATH 2250";')
-
-print(output.version())
-'''
-0.1.3
-'''
-
-print(output.json())
-'''
-{"version":"0.1.3","requirements":[{"query":{"quantity":{"Single":1},"selector":[{"Class":{"department_id":"MATH","course_number":2250}}]},"description":"Must take MATH 2250","priority":1}]}
-'''
-
-print(output.json_pretty()) 
-'''
-{
-  "version": "0.1.3",
-  "requirements": [
-    {
-      "query": {
-        "quantity": {
-          "Single": 1
-        },
-        "selector": [
-          {
-            "Class": {
-              "department_id": "MATH",
-              "course_number": 2250
-            }
-          }
-        ]
-      },
-      "description": "Must take MATH 2250",
-      "priority": 1
-    }
-  ]
-}
-'''
-```
-"""
+"""Python bindings for legacy MQL parsing and MQL 0.2 semantic IR validation."""
 
 from typing import Dict
 
+__version__: str
+
 class MQL:
-    """
-    Structured output from an MQL parse
-    """
-    def version(self) -> str: 
-        """Return the version of the parser used to create the structured output."""
-        ...
-    def json(self) -> str: 
-        """Return the structured output as JSON."""
-        ...
-    def json_pretty(self) -> str: 
-        """Return the structured output as pretty-printed JSON."""
-        ...
+    """Structured output from the retained legacy MQL parser."""
+    def version(self) -> str: ...
+    def json(self) -> str: ...
+    def json_pretty(self) -> str: ...
+
+class SemanticIR:
+    """Validated MQL 0.2 semantic IR document."""
+    def version(self) -> str: ...
+    def json(self) -> str: ...
+    def json_pretty(self) -> str: ...
 
 def parse(mql: str) -> MQL:
     """
@@ -103,4 +58,8 @@ def parse_extern_value(expr: str) -> str:
     Returns:
         Internal representation of the parsed value (for debugging/inspection)
     """
+    ...
+
+def validate_semantic_ir(json: str) -> SemanticIR:
+    """Deserialize and semantically validate a versioned MQL 0.2 IR document."""
     ...
