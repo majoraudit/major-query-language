@@ -205,7 +205,7 @@ checksum = "2874a2af47a2325c2001a6e6fad9b16a53b802102b528163885171cf92b15976"
 
 [[package]]
 name = "libmql"
-version = "0.1.12"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "lazy_static",
@@ -219,11 +219,12 @@ dependencies = [
 
 [[package]]
 name = "major-requirement-parser-cli"
-version = "0.1.8"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "clap",
  "libmql",
+ "serde_json",
 ]
 
 [[package]]
@@ -313,11 +314,11 @@ dependencies = [
 
 [[package]]
 name = "pylibmql"
-version = "0.1.12"
+version = "0.2.0"
 dependencies = [
  "libmql",
  "pyo3",
- "pyo3-build-config 0.28.3",
+ "serde_json",
 ]
 
 [[package]]
@@ -331,7 +332,7 @@ dependencies = [
  "memoffset",
  "once_cell",
  "portable-atomic",
- "pyo3-build-config 0.27.1",
+ "pyo3-build-config",
  "pyo3-ffi",
  "pyo3-macros",
  "unindent",
@@ -347,22 +348,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "pyo3-build-config"
-version = "0.28.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e368e7ddfdeb98c9bca7f8383be1648fd84ab466bf2bc015e94008db6d35611e"
-dependencies = [
- "target-lexicon",
-]
-
-[[package]]
 name = "pyo3-ffi"
 version = "0.27.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2dd13844a4242793e02df3e2ec093f540d948299a6a77ea9ce7afd8623f542be"
 dependencies = [
  "libc",
- "pyo3-build-config 0.27.1",
+ "pyo3-build-config",
 ]
 
 [[package]]
@@ -385,7 +377,7 @@ checksum = "70a3b2274450ba5288bc9b8c1b69ff569d1d61189d4bff38f8d22e03d17f932b"
 dependencies = [
  "heck",
  "proc-macro2",
- "pyo3-build-config 0.27.1",
+ "pyo3-build-config",
  "quote",
  "syn",
 ]

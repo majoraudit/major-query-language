@@ -1,0 +1,336 @@
+{
+  "schema_version": "0.2.0",
+  "institution": {
+    "schema_id": "https://yale.example/mql/institution",
+    "version": "2026-2027",
+    "normalization": { "strings": "NFC" },
+    "fields": [
+      { "target": "CATALOG_COURSE", "name": "level", "type": "INTEGER", "nullable": false, "operators": ["EQ", "GE", "LE"] },
+      { "target": "CATALOG_COURSE", "name": "subject", "type": "STRING", "nullable": false, "operators": ["EQ", "IN"] },
+      { "target": "CATALOG_COURSE", "name": "format", "type": "ENUM", "nullable": false, "enum_name": "course_format", "operators": ["EQ", "NE", "IN"] },
+      { "target": "CATALOG_COURSE", "name": "group", "type": "STRING", "nullable": true, "operators": ["EQ", "IS_NULL", "IS_UNKNOWN"] },
+      { "target": "TRANSCRIPT_ATTEMPT", "name": "grade", "type": "GRADE", "nullable": true, "operators": ["EQ", "GE", "IS_NULL"] },
+      { "target": "TRANSCRIPT_ATTEMPT", "name": "grading_mode", "type": "ENUM", "nullable": false, "enum_name": "grading_mode", "operators": ["EQ", "NE"] },
+      { "target": "TRANSCRIPT_ATTEMPT", "name": "source", "type": "ENUM", "nullable": false, "enum_name": "source", "operators": ["EQ", "IN"] }
+    ],
+    "enums": {
+      "course_format": ["lecture", "seminar", "lab", "research"],
+      "grading_mode": ["letter", "crdf"],
+      "source": ["Yale", "study_abroad", "transfer", "summer"]
+    },
+    "grade_order": ["F", "D", "C", "B", "A"],
+    "joins": [
+      { "from_target": "TRANSCRIPT_ATTEMPT", "from_field": "canonical_course_id", "to_target": "CATALOG_COURSE", "to_field": "canonical_course_id" }
+    ],
+    "facts": [
+      { "name": "ap_psychology_5", "approval": false, "parameters": {} },
+      { "name": "dus_substitution", "approval": true, "parameters": { "for": "requirement_id" } }
+    ],
+    "department_aliases": { "EENG": "ECE" },
+    "tag_values": ["YC CPSC Elective", "YC HIST Preindustrial"]
+  },
+  "fixtures": [
+    {
+      "fixture_id": "cs_systems",
+      "patterns": ["P1", "P3", "P10", "P18"],
+      "program": {
+        "schema_version": "0.2.0", "program_id": "cs_systems", "catalog_year": "2026-2027",
+        "institution_schema": { "id": "https://yale.example/mql/institution", "version": "2026-2027" }, "credit_scale": 2,
+        "sources": [{ "source_id": "main", "path": "fixtures/cs_systems.mql" }],
+        "choices": [{
+          "meta": { "id": "systems", "node_id": "cs_systems::systems", "description": "Systems sequence", "span": { "source_id": "main", "start": { "byte": 0, "line": 1, "column": 1 }, "end": { "byte": 10, "line": 1, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 0, "line": 1, "column": 1 }, "end": { "byte": 10, "line": 1, "column": 11 } }] },
+          "owner": "SOLVER", "value_type": "STRING", "alternatives": ["split", "combined"]
+        }],
+        "facts": [],
+        "requirements": [
+          {
+            "meta": { "id": "systems_split", "node_id": "cs_systems::systems_split", "description": "Split systems sequence", "span": { "source_id": "main", "start": { "byte": 11, "line": 2, "column": 1 }, "end": { "byte": 30, "line": 2, "column": 20 } }, "provenance": [{ "source_id": "main", "start": { "byte": 11, "line": 2, "column": 1 }, "end": { "byte": 30, "line": 2, "column": 20 } }] },
+            "roles": ["core"], "obligation": "REQUIRED", "active_when": { "kind": "CHOICE_EQUALS", "choice_id": "systems", "equals": "split" },
+            "contribution": { "kind": "DISTINCT_ATTEMPTS", "unit": "COURSES" }, "lower": { "kind": "FIXED", "value": 2 }, "upper": { "kind": "FIXED", "value": 2 },
+            "selector": { "kind": "COURSE_LIST", "canonical_course_ids": ["CPSC3231", "CPSC3232"] }, "children": [], "constraint_ids": []
+          },
+          {
+            "meta": { "id": "systems_combined", "node_id": "cs_systems::systems_combined", "description": "Combined systems course", "span": { "source_id": "main", "start": { "byte": 31, "line": 3, "column": 1 }, "end": { "byte": 50, "line": 3, "column": 20 } }, "provenance": [{ "source_id": "main", "start": { "byte": 31, "line": 3, "column": 1 }, "end": { "byte": 50, "line": 3, "column": 20 } }] },
+            "roles": ["core"], "obligation": "REQUIRED", "active_when": { "kind": "CHOICE_EQUALS", "choice_id": "systems", "equals": "combined" },
+            "contribution": { "kind": "DISTINCT_ATTEMPTS", "unit": "COURSES" }, "lower": { "kind": "FIXED", "value": 1 }, "upper": { "kind": "FIXED", "value": 1 },
+            "selector": { "kind": "COURSE_LIST", "canonical_course_ids": ["CPSC3230"] }, "children": [], "constraint_ids": []
+          },
+          {
+            "meta": { "id": "electives", "node_id": "cs_systems::electives", "description": "Electives vary by systems choice", "span": { "source_id": "main", "start": { "byte": 51, "line": 4, "column": 1 }, "end": { "byte": 70, "line": 4, "column": 20 } }, "provenance": [{ "source_id": "main", "start": { "byte": 51, "line": 4, "column": 1 }, "end": { "byte": 70, "line": 4, "column": 20 } }] },
+            "roles": ["elective"], "obligation": "REQUIRED", "active_when": { "kind": "CONSTANT", "value": true },
+            "contribution": { "kind": "DISTINCT_ATTEMPTS", "unit": "COURSES" }, "lower": { "kind": "CHOICE_TABLE", "choice_id": "systems", "cases": { "split": 1, "combined": 2 } }, "upper": null,
+            "selector": { "kind": "COURSE_LIST", "canonical_course_ids": ["CPSC3650", "CPSC3660"] }, "children": [], "constraint_ids": []
+          }
+        ],
+        "constraints": [], "sharing_rules": [], "effects": []
+      },
+      "catalog": {
+        "schema_version": "0.2.0", "credit_scale": 2, "offerings": [],
+        "courses": [
+          { "canonical_course_id": "CPSC3230", "codes": ["CPSC 3230"], "subject": "CPSC", "number": 3230, "suffix": null, "level": 3000, "format": "lecture", "credit_units": 2, "attributes": [], "distributions": [], "language": "English", "group": "systems" },
+          { "canonical_course_id": "CPSC3650", "codes": ["CPSC 3650"], "subject": "CPSC", "number": 3650, "suffix": null, "level": 3000, "format": "lecture", "credit_units": 2, "attributes": ["YC CPSC Elective"], "distributions": [], "language": "English", "group": "theory" },
+          { "canonical_course_id": "CPSC3660", "codes": ["CPSC 3660"], "subject": "CPSC", "number": 3660, "suffix": null, "level": 3000, "format": "lecture", "credit_units": 2, "attributes": ["YC CPSC Elective"], "distributions": [], "language": "English", "group": "theory" }
+        ]
+      },
+      "cases": [{
+        "transcript": { "schema_version": "0.2.0", "credit_scale": 2, "attempts": [
+          { "attempt_id": "a3230", "canonical_course_id": "CPSC3230", "enrolled_under_code": "CPSC 3230", "term": "2025FA", "academic_level": "junior", "grade": "A", "grading_mode": "letter", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true },
+          { "attempt_id": "a3650", "canonical_course_id": "CPSC3650", "enrolled_under_code": "CPSC 3650", "term": "2026SP", "academic_level": "junior", "grade": "B", "grading_mode": "letter", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true },
+          { "attempt_id": "a3660", "canonical_course_id": "CPSC3660", "enrolled_under_code": "CPSC 3660", "term": "2026FA", "academic_level": "senior", "grade": "A", "grading_mode": "letter", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true }
+        ] },
+        "profile": { "schema_version": "0.2.0", "student_id": "cs1", "declared_choices": {}, "facts": [], "class_year": 2027 },
+        "expected": {
+          "case_id": "cs_combined_complete", "status": "COMPLETE", "program_complete": true, "choices": { "systems": "combined" }, "effects": [],
+          "assignments": [
+            { "attempt_id": "a3230", "requirement_id": "systems_combined", "constraint_ids": [] },
+            { "attempt_id": "a3650", "requirement_id": "electives", "constraint_ids": [] },
+            { "attempt_id": "a3660", "requirement_id": "electives", "constraint_ids": [] }
+          ], "rejections": [],
+          "requirements": [
+            { "requirement_id": "systems_split", "active": false, "q": 0, "lower": 2, "upper": 2, "satisfied": false, "progress": { "numerator": 0, "denominator": 1 } },
+            { "requirement_id": "systems_combined", "active": true, "q": 1, "lower": 1, "upper": 1, "satisfied": true, "progress": { "numerator": 1, "denominator": 1 } },
+            { "requirement_id": "electives", "active": true, "q": 2, "lower": 2, "upper": null, "satisfied": true, "progress": { "numerator": 1, "denominator": 1 } }
+          ], "totals": [], "objective": { "satisfied_required_roots": 2, "progress": { "numerator": 0, "denominator": 1 }, "manual_approval_uses": 0 },
+          "alternate_witnesses": [{ "kind": "candidate_usefulness", "candidate": "CPSC3660", "preserves_objective": true, "requires_reassignment": true }],
+          "trace": [
+            { "step": 1, "semantic_id": "systems", "result": "combined", "rationale": "The solver-owned combined branch satisfies systems and activates the two-elective bound." },
+            { "step": 2, "semantic_id": "systems_split", "result": "inactive", "rationale": "The split branch contributes neither assignments nor progress." },
+            { "step": 3, "semantic_id": "electives", "result": "satisfied", "rationale": "Two distinct elective attempts meet the choice-dependent lower bound." }
+          ]
+        }
+      }]
+    },
+    {
+      "fixture_id": "history_sharing",
+      "patterns": ["P5", "P8", "P11", "P17"],
+      "program": {
+        "schema_version": "0.2.0", "program_id": "history_sharing", "catalog_year": "2026-2027", "institution_schema": { "id": "https://yale.example/mql/institution", "version": "2026-2027" }, "credit_scale": 2,
+        "sources": [{ "source_id": "main", "path": "fixtures/history.mql" }], "choices": [], "facts": [],
+        "requirements": [
+          { "meta": { "id": "regions", "node_id": "history_sharing::regions", "description": "Regions", "span": { "source_id": "main", "start": { "byte": 0, "line": 1, "column": 1 }, "end": { "byte": 10, "line": 1, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 0, "line": 1, "column": 1 }, "end": { "byte": 10, "line": 1, "column": 11 } }] }, "roles": ["core"], "obligation": "REQUIRED", "active_when": { "kind": "CONSTANT", "value": true }, "contribution": { "kind": "DISTINCT_ATTEMPTS", "unit": "COURSES" }, "lower": { "kind": "FIXED", "value": 1 }, "upper": { "kind": "FIXED", "value": 1 }, "selector": { "kind": "COURSE_LIST", "canonical_course_ids": ["HIST3100"] }, "children": [], "constraint_ids": [] },
+          { "meta": { "id": "preindustrial", "node_id": "history_sharing::preindustrial", "description": "Preindustrial", "span": { "source_id": "main", "start": { "byte": 11, "line": 2, "column": 1 }, "end": { "byte": 21, "line": 2, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 11, "line": 2, "column": 1 }, "end": { "byte": 21, "line": 2, "column": 11 } }] }, "roles": ["core"], "obligation": "REQUIRED", "active_when": { "kind": "CONSTANT", "value": true }, "contribution": { "kind": "DISTINCT_ATTEMPTS", "unit": "COURSES" }, "lower": { "kind": "FIXED", "value": 1 }, "upper": { "kind": "FIXED", "value": 1 }, "selector": { "kind": "COURSE_LIST", "canonical_course_ids": ["HIST3100"] }, "children": [], "constraint_ids": [] },
+          { "meta": { "id": "seminars", "node_id": "history_sharing::seminars", "description": "Seminars", "span": { "source_id": "main", "start": { "byte": 22, "line": 3, "column": 1 }, "end": { "byte": 32, "line": 3, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 22, "line": 3, "column": 1 }, "end": { "byte": 32, "line": 3, "column": 11 } }] }, "roles": ["senior"], "obligation": "REQUIRED", "active_when": { "kind": "CONSTANT", "value": true }, "contribution": { "kind": "DISTINCT_ATTEMPTS", "unit": "COURSES" }, "lower": { "kind": "FIXED", "value": 1 }, "upper": { "kind": "FIXED", "value": 1 }, "selector": { "kind": "COURSE_LIST", "canonical_course_ids": ["HIST3100"] }, "children": [], "constraint_ids": [] }
+        ],
+        "constraints": [{
+          "meta": { "id": "major_total", "node_id": "history_sharing::major_total", "description": "Two distinct credits overall in reduced fixture", "span": { "source_id": "main", "start": { "byte": 33, "line": 4, "column": 1 }, "end": { "byte": 43, "line": 4, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 33, "line": 4, "column": 1 }, "end": { "byte": 43, "line": 4, "column": 11 } }] },
+          "kind": "TOTAL", "active_when": { "kind": "CONSTANT", "value": true }, "scope": { "kind": "PROGRAM" }, "minimum": 4, "count": "CREDIT_UNITS"
+        }],
+        "sharing_rules": [{
+          "meta": { "id": "hist_share", "node_id": "history_sharing::hist_share", "description": "Three-way sharing", "span": { "source_id": "main", "start": { "byte": 44, "line": 5, "column": 1 }, "end": { "byte": 54, "line": 5, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 44, "line": 5, "column": 1 }, "end": { "byte": 54, "line": 5, "column": 11 } }] },
+          "active_when": { "kind": "CONSTANT", "value": true }, "mode": "SHARE", "requirement_ids": ["regions", "preindustrial", "seminars"]
+        }], "effects": []
+      },
+      "catalog": { "schema_version": "0.2.0", "credit_scale": 2, "offerings": [], "courses": [
+        { "canonical_course_id": "HIST3100", "codes": ["HIST 3100"], "subject": "HIST", "number": 3100, "suffix": null, "level": 3000, "format": "seminar", "credit_units": 2, "attributes": ["YC HIST Preindustrial"], "distributions": ["Hu"], "language": "English", "group": "Europe" }
+      ] },
+      "cases": [{
+        "transcript": { "schema_version": "0.2.0", "credit_scale": 2, "attempts": [{ "attempt_id": "h1", "canonical_course_id": "HIST3100", "enrolled_under_code": "HIST 3100", "term": "2026SP", "academic_level": "junior", "grade": "A", "grading_mode": "letter", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true }] },
+        "profile": { "schema_version": "0.2.0", "student_id": "hist1", "declared_choices": {}, "facts": [], "class_year": 2027 },
+        "expected": {
+          "case_id": "history_shared_but_total_short", "status": "INCOMPLETE", "program_complete": false, "choices": {}, "effects": [],
+          "assignments": [{ "attempt_id": "h1", "requirement_id": "regions", "constraint_ids": ["hist_share"] }, { "attempt_id": "h1", "requirement_id": "preindustrial", "constraint_ids": ["hist_share"] }, { "attempt_id": "h1", "requirement_id": "seminars", "constraint_ids": ["hist_share"] }], "rejections": [],
+          "requirements": [{ "requirement_id": "regions", "active": true, "q": 1, "lower": 1, "upper": 1, "satisfied": true, "progress": { "numerator": 1, "denominator": 1 } }, { "requirement_id": "preindustrial", "active": true, "q": 1, "lower": 1, "upper": 1, "satisfied": true, "progress": { "numerator": 1, "denominator": 1 } }, { "requirement_id": "seminars", "active": true, "q": 1, "lower": 1, "upper": 1, "satisfied": true, "progress": { "numerator": 1, "denominator": 1 } }],
+          "totals": [{ "constraint_id": "major_total", "distinct_attempts": ["h1"], "credit_units": 2, "minimum": 4, "satisfied": false }], "objective": { "satisfied_required_roots": 3, "progress": { "numerator": 0, "denominator": 1 }, "manual_approval_uses": 0 },
+          "trace": [{ "step": 1, "semantic_id": "hist_share", "result": "allowed", "rationale": "The same attempt may witness all three pairwise-shareable requirements." }, { "step": 2, "semantic_id": "major_total", "result": "failed", "rationale": "The shared attempt contributes two credit units once to the distinct scoped total, not six." }]
+        }
+      }]
+    },
+    {
+      "fixture_id": "ee_electives",
+      "patterns": ["P2", "P9", "P12", "P13"],
+      "program": {
+        "schema_version": "0.2.0", "program_id": "ee_electives", "catalog_year": "2026-2027", "institution_schema": { "id": "https://yale.example/mql/institution", "version": "2026-2027" }, "credit_scale": 2,
+        "sources": [{ "source_id": "main", "path": "fixtures/ee.mql" }], "choices": [], "facts": [],
+        "requirements": [{
+          "meta": { "id": "electives", "node_id": "ee_electives::electives", "description": "Four electives, three advanced", "span": { "source_id": "main", "start": { "byte": 0, "line": 1, "column": 1 }, "end": { "byte": 10, "line": 1, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 0, "line": 1, "column": 1 }, "end": { "byte": 10, "line": 1, "column": 11 } }] },
+          "roles": ["elective"], "obligation": "REQUIRED", "active_when": { "kind": "CONSTANT", "value": true }, "contribution": { "kind": "DISTINCT_ATTEMPTS", "unit": "COURSES" }, "lower": { "kind": "FIXED", "value": 4 }, "upper": { "kind": "FIXED", "value": 4 },
+          "selector": { "kind": "PREDICATE", "predicate": { "kind": "AND", "operands": [{ "kind": "COMPARE", "field": { "target": "CATALOG_COURSE", "field": "subject", "type": "STRING" }, "operator": "EQ", "value": "ECE" }, { "kind": "COMPARE", "field": { "target": "CATALOG_COURSE", "field": "format", "type": "ENUM" }, "operator": "NE", "value": "research" }] } }, "children": [], "constraint_ids": ["three_advanced"]
+        }],
+        "constraints": [{
+          "meta": { "id": "three_advanced", "node_id": "ee_electives::three_advanced", "description": "At least three at level 4000", "span": { "source_id": "main", "start": { "byte": 11, "line": 2, "column": 1 }, "end": { "byte": 21, "line": 2, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 11, "line": 2, "column": 1 }, "end": { "byte": 21, "line": 2, "column": 11 } }] },
+          "kind": "SELECTED_SET", "active_when": { "kind": "CONSTANT", "value": true }, "scope": { "kind": "DIRECT", "requirement_id": "electives" }, "comparison": "AT_LEAST", "amount": 3, "unit": "ATTEMPTS", "predicate": { "kind": "COMPARE", "field": { "target": "CATALOG_COURSE", "field": "level", "type": "INTEGER" }, "operator": "GE", "value": 4000 }
+        }], "sharing_rules": [], "effects": []
+      },
+      "catalog": { "schema_version": "0.2.0", "credit_scale": 2, "offerings": [], "courses": [
+        { "canonical_course_id": "ECE3000", "codes": ["ECE 3000"], "subject": "ECE", "number": 3000, "suffix": null, "level": 3000, "format": "lecture", "credit_units": 2, "attributes": [], "distributions": ["Sc"], "language": "English", "group": "signals" },
+        { "canonical_course_id": "ECE4100", "codes": ["ECE 4100"], "subject": "ECE", "number": 4100, "suffix": null, "level": 4000, "format": "lecture", "credit_units": 2, "attributes": [], "distributions": ["Sc"], "language": "English", "group": "signals" },
+        { "canonical_course_id": "ECE4200", "codes": ["ECE 4200"], "subject": "ECE", "number": 4200, "suffix": null, "level": 4000, "format": "lecture", "credit_units": 2, "attributes": [], "distributions": ["Sc"], "language": "English", "group": "devices" },
+        { "canonical_course_id": "ECE4300", "codes": ["ECE 4300"], "subject": "ECE", "number": 4300, "suffix": null, "level": 4000, "format": "lecture", "credit_units": 2, "attributes": [], "distributions": ["Sc"], "language": "English", "group": "systems" },
+        { "canonical_course_id": "ECE4900", "codes": ["ECE 4900"], "subject": "ECE", "number": 4900, "suffix": null, "level": 4000, "format": "research", "credit_units": 2, "attributes": [], "distributions": ["Sc"], "language": "English", "group": "research" }
+      ] },
+      "cases": [{
+        "transcript": { "schema_version": "0.2.0", "credit_scale": 2, "attempts": [
+          { "attempt_id": "e3", "canonical_course_id": "ECE3000", "enrolled_under_code": "ECE 3000", "term": "2025FA", "academic_level": "junior", "grade": "B", "grading_mode": "letter", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true },
+          { "attempt_id": "e41", "canonical_course_id": "ECE4100", "enrolled_under_code": "ECE 4100", "term": "2026SP", "academic_level": "junior", "grade": "A", "grading_mode": "letter", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true },
+          { "attempt_id": "e42", "canonical_course_id": "ECE4200", "enrolled_under_code": "ECE 4200", "term": "2026FA", "academic_level": "senior", "grade": "A", "grading_mode": "letter", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true },
+          { "attempt_id": "e49", "canonical_course_id": "ECE4900", "enrolled_under_code": "ECE 4900", "term": "2026FA", "academic_level": "senior", "grade": "A", "grading_mode": "letter", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true }
+        ] },
+        "profile": { "schema_version": "0.2.0", "student_id": "ee1", "declared_choices": {}, "facts": [], "class_year": 2027 },
+        "expected": {
+          "case_id": "ee_research_rejected", "status": "INCOMPLETE", "program_complete": false, "choices": {}, "effects": [],
+          "assignments": [{ "attempt_id": "e3", "requirement_id": "electives", "constraint_ids": ["three_advanced"] }, { "attempt_id": "e41", "requirement_id": "electives", "constraint_ids": ["three_advanced"] }, { "attempt_id": "e42", "requirement_id": "electives", "constraint_ids": ["three_advanced"] }],
+          "rejections": [{ "attempt_id": "e49", "requirement_id": "electives", "constraint_id": "electives", "reason": "The selector excludes research format before selected-set counting." }],
+          "requirements": [{ "requirement_id": "electives", "active": true, "q": 3, "lower": 4, "upper": 4, "satisfied": false, "progress": { "numerator": 3, "denominator": 4 } }], "totals": [],
+          "objective": { "satisfied_required_roots": 0, "progress": { "numerator": 3, "denominator": 4 }, "manual_approval_uses": 0 },
+          "trace": [{ "step": 1, "semantic_id": "electives", "result": "three eligible", "rationale": "The research attempt fails the compound selector." }, { "step": 2, "semantic_id": "three_advanced", "result": "two advanced", "rationale": "The selected-set condition sees the same three contributing attempts, not a duplicated requirement." }]
+        }
+      }]
+    },
+    {
+      "fixture_id": "applied_math_groups",
+      "patterns": ["P6", "P7"],
+      "program": {
+        "schema_version": "0.2.0", "program_id": "applied_math_groups", "catalog_year": "2026-2027", "institution_schema": { "id": "https://yale.example/mql/institution", "version": "2026-2027" }, "credit_scale": 2,
+        "sources": [{ "source_id": "main", "path": "fixtures/amth.mql" }], "choices": [], "facts": [],
+        "requirements": [{
+          "meta": { "id": "breadth", "node_id": "applied_math_groups::breadth", "description": "Three breadth areas", "span": { "source_id": "main", "start": { "byte": 0, "line": 1, "column": 1 }, "end": { "byte": 10, "line": 1, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 0, "line": 1, "column": 1 }, "end": { "byte": 10, "line": 1, "column": 11 } }] },
+          "roles": ["elective"], "obligation": "REQUIRED", "active_when": { "kind": "CONSTANT", "value": true }, "contribution": { "kind": "DISTINCT_ATTEMPTS", "unit": "COURSES" }, "lower": { "kind": "FIXED", "value": 3 }, "upper": { "kind": "FIXED", "value": 3 }, "selector": { "kind": "COURSE_LIST", "canonical_course_ids": ["AMTH3100", "AMTH3200", "AMTH3300"] }, "children": [], "constraint_ids": ["distinct_areas"]
+        }, {
+          "meta": { "id": "concentration", "node_id": "applied_math_groups::concentration", "description": "Two courses in one area", "span": { "source_id": "main", "start": { "byte": 11, "line": 2, "column": 1 }, "end": { "byte": 21, "line": 2, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 11, "line": 2, "column": 1 }, "end": { "byte": 21, "line": 2, "column": 11 } }] },
+          "roles": ["concentration"], "obligation": "REQUIRED", "active_when": { "kind": "CONSTANT", "value": true }, "contribution": { "kind": "DISTINCT_ATTEMPTS", "unit": "COURSES" }, "lower": { "kind": "FIXED", "value": 2 }, "upper": { "kind": "FIXED", "value": 2 }, "selector": { "kind": "COURSE_LIST", "canonical_course_ids": ["AMTH4100", "AMTH4200"] }, "children": [], "constraint_ids": ["same_area"]
+        }],
+        "constraints": [
+          { "meta": { "id": "distinct_areas", "node_id": "applied_math_groups::distinct_areas", "description": "Distinct areas", "span": { "source_id": "main", "start": { "byte": 22, "line": 3, "column": 1 }, "end": { "byte": 32, "line": 3, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 22, "line": 3, "column": 1 }, "end": { "byte": 32, "line": 3, "column": 11 } }] }, "kind": "GROUP", "active_when": { "kind": "CONSTANT", "value": true }, "scope": { "kind": "DIRECT", "requirement_id": "breadth" }, "mode": "DISTINCT_AT_LEAST", "field": { "target": "CATALOG_COURSE", "field": "group", "type": "STRING" }, "amount": 3 },
+          { "meta": { "id": "same_area", "node_id": "applied_math_groups::same_area", "description": "Same concentration area", "span": { "source_id": "main", "start": { "byte": 33, "line": 4, "column": 1 }, "end": { "byte": 43, "line": 4, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 33, "line": 4, "column": 1 }, "end": { "byte": 43, "line": 4, "column": 11 } }] }, "kind": "GROUP", "active_when": { "kind": "CONSTANT", "value": true }, "scope": { "kind": "DIRECT", "requirement_id": "concentration" }, "mode": "SAME", "field": { "target": "CATALOG_COURSE", "field": "group", "type": "STRING" }, "amount": 1 }
+        ], "sharing_rules": [], "effects": []
+      },
+      "catalog": { "schema_version": "0.2.0", "credit_scale": 2, "offerings": [], "courses": [
+        { "canonical_course_id": "AMTH3100", "codes": ["AMTH 3100"], "subject": "AMTH", "number": 3100, "suffix": null, "level": 3000, "format": "lecture", "credit_units": 2, "attributes": [], "distributions": ["QR"], "language": "English", "group": "analysis" },
+        { "canonical_course_id": "AMTH3200", "codes": ["AMTH 3200"], "subject": "AMTH", "number": 3200, "suffix": null, "level": 3000, "format": "lecture", "credit_units": 2, "attributes": [], "distributions": ["QR"], "language": "English", "group": "discrete" },
+        { "canonical_course_id": "AMTH3300", "codes": ["AMTH 3300"], "subject": "AMTH", "number": 3300, "suffix": null, "level": 3000, "format": "lecture", "credit_units": 2, "attributes": [], "distributions": ["QR"], "language": "English", "group": "modeling" },
+        { "canonical_course_id": "AMTH4100", "codes": ["AMTH 4100"], "subject": "AMTH", "number": 4100, "suffix": null, "level": 4000, "format": "lecture", "credit_units": 2, "attributes": [], "distributions": ["QR"], "language": "English", "group": "analysis" },
+        { "canonical_course_id": "AMTH4200", "codes": ["AMTH 4200"], "subject": "AMTH", "number": 4200, "suffix": null, "level": 4000, "format": "lecture", "credit_units": 2, "attributes": [], "distributions": ["QR"], "language": "English", "group": "analysis" }
+      ] },
+      "cases": [{
+        "transcript": { "schema_version": "0.2.0", "credit_scale": 2, "attempts": [
+          { "attempt_id": "m31", "canonical_course_id": "AMTH3100", "enrolled_under_code": "AMTH 3100", "term": "2025FA", "academic_level": "junior", "grade": "A", "grading_mode": "letter", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true },
+          { "attempt_id": "m32", "canonical_course_id": "AMTH3200", "enrolled_under_code": "AMTH 3200", "term": "2026SP", "academic_level": "junior", "grade": "A", "grading_mode": "letter", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true },
+          { "attempt_id": "m33", "canonical_course_id": "AMTH3300", "enrolled_under_code": "AMTH 3300", "term": "2026FA", "academic_level": "senior", "grade": "B", "grading_mode": "letter", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true },
+          { "attempt_id": "m41", "canonical_course_id": "AMTH4100", "enrolled_under_code": "AMTH 4100", "term": "2026FA", "academic_level": "senior", "grade": "A", "grading_mode": "letter", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true },
+          { "attempt_id": "m42", "canonical_course_id": "AMTH4200", "enrolled_under_code": "AMTH 4200", "term": "2027SP", "academic_level": "senior", "grade": "A", "grading_mode": "letter", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true }
+        ] },
+        "profile": { "schema_version": "0.2.0", "student_id": "am1", "declared_choices": {}, "facts": [], "class_year": 2027 },
+        "expected": {
+          "case_id": "am_groups_complete", "status": "COMPLETE", "program_complete": true, "choices": {}, "effects": [],
+          "assignments": [{ "attempt_id": "m31", "requirement_id": "breadth", "constraint_ids": ["distinct_areas"] }, { "attempt_id": "m32", "requirement_id": "breadth", "constraint_ids": ["distinct_areas"] }, { "attempt_id": "m33", "requirement_id": "breadth", "constraint_ids": ["distinct_areas"] }, { "attempt_id": "m41", "requirement_id": "concentration", "constraint_ids": ["same_area"] }, { "attempt_id": "m42", "requirement_id": "concentration", "constraint_ids": ["same_area"] }], "rejections": [],
+          "requirements": [{ "requirement_id": "breadth", "active": true, "q": 3, "lower": 3, "upper": 3, "satisfied": true, "progress": { "numerator": 1, "denominator": 1 } }, { "requirement_id": "concentration", "active": true, "q": 2, "lower": 2, "upper": 2, "satisfied": true, "progress": { "numerator": 1, "denominator": 1 } }], "totals": [], "objective": { "satisfied_required_roots": 2, "progress": { "numerator": 0, "denominator": 1 }, "manual_approval_uses": 0 },
+          "trace": [{ "step": 1, "semantic_id": "distinct_areas", "result": "three groups", "rationale": "Breadth uses analysis, discrete, and modeling." }, { "step": 2, "semantic_id": "same_area", "result": "analysis", "rationale": "Both concentration attempts share the analysis group." }]
+        }
+      }]
+    },
+    {
+      "fixture_id": "chemistry_credits",
+      "patterns": ["P4", "P15", "P19"],
+      "program": {
+        "schema_version": "0.2.0", "program_id": "chemistry_credits", "catalog_year": "2026-2027", "institution_schema": { "id": "https://yale.example/mql/institution", "version": "2026-2027" }, "credit_scale": 2,
+        "sources": [{ "source_id": "main", "path": "fixtures/chem.mql" }], "choices": [], "facts": [],
+        "requirements": [{
+          "meta": { "id": "advanced", "node_id": "chemistry_credits::advanced", "description": "Four advanced credits", "span": { "source_id": "main", "start": { "byte": 0, "line": 1, "column": 1 }, "end": { "byte": 10, "line": 1, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 0, "line": 1, "column": 1 }, "end": { "byte": 10, "line": 1, "column": 11 } }] },
+          "roles": ["elective"], "obligation": "REQUIRED", "active_when": { "kind": "CONSTANT", "value": true }, "contribution": { "kind": "CREDITS", "unit": "CREDIT_UNITS" }, "lower": { "kind": "FIXED", "value": 8 }, "upper": null, "selector": { "kind": "COURSE_LIST", "canonical_course_ids": ["CHEM4000", "CHEM4100", "CHEM4900"] }, "children": [], "constraint_ids": ["research_repeat"]
+        }],
+        "constraints": [{
+          "meta": { "id": "research_repeat", "node_id": "chemistry_credits::research_repeat", "description": "Research counts at most twice", "span": { "source_id": "main", "start": { "byte": 11, "line": 2, "column": 1 }, "end": { "byte": 21, "line": 2, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 11, "line": 2, "column": 1 }, "end": { "byte": 21, "line": 2, "column": 11 } }] },
+          "kind": "REPEAT", "active_when": { "kind": "CONSTANT", "value": true }, "scope": { "kind": "DIRECT", "requirement_id": "advanced" }, "maximum_attempts": 2, "predicate": { "kind": "COMPARE", "field": { "target": "CATALOG_COURSE", "field": "subject", "type": "STRING" }, "operator": "EQ", "value": "CHEM" }
+        }], "sharing_rules": [], "effects": []
+      },
+      "catalog": { "schema_version": "0.2.0", "credit_scale": 2, "offerings": [], "courses": [
+        { "canonical_course_id": "CHEM4000", "codes": ["CHEM 4000"], "subject": "CHEM", "number": 4000, "suffix": null, "level": 4000, "format": "lecture", "credit_units": 1, "attributes": [], "distributions": ["Sc"], "language": "English", "group": "advanced" },
+        { "canonical_course_id": "CHEM4100", "codes": ["CHEM 4100"], "subject": "CHEM", "number": 4100, "suffix": null, "level": 4000, "format": "lecture", "credit_units": 3, "attributes": [], "distributions": ["Sc"], "language": "English", "group": "advanced" },
+        { "canonical_course_id": "CHEM4900", "codes": ["CHEM 4900"], "subject": "CHEM", "number": 4900, "suffix": null, "level": 4000, "format": "research", "credit_units": 2, "attributes": [], "distributions": ["Sc"], "language": "English", "group": "research" }
+      ] },
+      "cases": [{
+        "transcript": { "schema_version": "0.2.0", "credit_scale": 2, "attempts": [
+          { "attempt_id": "c40", "canonical_course_id": "CHEM4000", "enrolled_under_code": "CHEM 4000", "term": "2025FA", "academic_level": "junior", "grade": "A", "grading_mode": "letter", "earned_credit_units": 1, "source": "Yale", "credit_bearing": true },
+          { "attempt_id": "c41", "canonical_course_id": "CHEM4100", "enrolled_under_code": "CHEM 4100", "term": "2026SP", "academic_level": "junior", "grade": "A", "grading_mode": "letter", "earned_credit_units": 3, "source": "Yale", "credit_bearing": true },
+          { "attempt_id": "c49a", "canonical_course_id": "CHEM4900", "enrolled_under_code": "CHEM 4900", "term": "2026FA", "academic_level": "senior", "grade": "A", "grading_mode": "letter", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true },
+          { "attempt_id": "c49b", "canonical_course_id": "CHEM4900", "enrolled_under_code": "CHEM 4900", "term": "2027SP", "academic_level": "senior", "grade": "A", "grading_mode": "letter", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true }
+        ] },
+        "profile": { "schema_version": "0.2.0", "student_id": "chem1", "declared_choices": {}, "facts": [], "class_year": 2027 },
+        "expected": {
+          "case_id": "chem_mixed_credits_complete", "status": "COMPLETE", "program_complete": true, "choices": {}, "effects": [],
+          "assignments": [{ "attempt_id": "c40", "requirement_id": "advanced", "constraint_ids": ["research_repeat"] }, { "attempt_id": "c41", "requirement_id": "advanced", "constraint_ids": ["research_repeat"] }, { "attempt_id": "c49a", "requirement_id": "advanced", "constraint_ids": ["research_repeat"] }, { "attempt_id": "c49b", "requirement_id": "advanced", "constraint_ids": ["research_repeat"] }], "rejections": [],
+          "requirements": [{ "requirement_id": "advanced", "active": true, "q": 8, "lower": 8, "upper": null, "satisfied": true, "progress": { "numerator": 1, "denominator": 1 } }], "totals": [], "objective": { "satisfied_required_roots": 1, "progress": { "numerator": 0, "denominator": 1 }, "manual_approval_uses": 0 },
+          "trace": [{ "step": 1, "semantic_id": "advanced", "result": "eight units", "rationale": "Earned credits 1+3+2+2 equal four credits at scale two." }, { "step": 2, "semantic_id": "research_repeat", "result": "two attempts", "rationale": "The two distinct CHEM 4900 attempts are within the repeat cap." }]
+        }
+      }]
+    },
+    {
+      "fixture_id": "psychology_waiver",
+      "patterns": ["P14", "P16", "P20"],
+      "program": {
+        "schema_version": "0.2.0", "program_id": "psychology_waiver", "catalog_year": "2026-2027", "institution_schema": { "id": "https://yale.example/mql/institution", "version": "2026-2027" }, "credit_scale": 2,
+        "sources": [{ "source_id": "main", "path": "fixtures/psych.mql" }], "choices": [],
+        "facts": [{ "meta": { "id": "ap5", "node_id": "psychology_waiver::ap5", "description": "AP Psychology score 5", "span": { "source_id": "main", "start": { "byte": 0, "line": 1, "column": 1 }, "end": { "byte": 10, "line": 1, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 0, "line": 1, "column": 1 }, "end": { "byte": 10, "line": 1, "column": 11 } }] }, "fact_type": "ap_psychology_5", "parameters": {}, "approval": false }],
+        "requirements": [{
+          "meta": { "id": "intro", "node_id": "psychology_waiver::intro", "description": "Introduction to psychology", "span": { "source_id": "main", "start": { "byte": 11, "line": 2, "column": 1 }, "end": { "byte": 21, "line": 2, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 11, "line": 2, "column": 1 }, "end": { "byte": 21, "line": 2, "column": 11 } }] },
+          "roles": ["prerequisite"], "obligation": "REQUIRED", "active_when": { "kind": "CONSTANT", "value": true }, "contribution": { "kind": "SLOT", "unit": "SLOTS" }, "lower": { "kind": "FIXED", "value": 1 }, "upper": { "kind": "FIXED", "value": 1 }, "selector": { "kind": "COURSE_LIST", "canonical_course_ids": ["PSYC1100"] }, "children": [], "constraint_ids": []
+        }, {
+          "meta": { "id": "graded_elective", "node_id": "psychology_waiver::graded_elective", "description": "Letter-graded elective at B or above", "span": { "source_id": "main", "start": { "byte": 22, "line": 3, "column": 1 }, "end": { "byte": 32, "line": 3, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 22, "line": 3, "column": 1 }, "end": { "byte": 32, "line": 3, "column": 11 } }] },
+          "roles": ["elective"], "obligation": "REQUIRED", "active_when": { "kind": "CONSTANT", "value": true }, "contribution": { "kind": "SLOT", "unit": "SLOTS" }, "lower": { "kind": "FIXED", "value": 1 }, "upper": { "kind": "FIXED", "value": 1 },
+          "selector": { "kind": "PREDICATE", "predicate": { "kind": "AND", "operands": [{ "kind": "COMPARE", "field": { "target": "TRANSCRIPT_ATTEMPT", "field": "grading_mode", "type": "ENUM" }, "operator": "EQ", "value": "letter" }, { "kind": "COMPARE", "field": { "target": "TRANSCRIPT_ATTEMPT", "field": "grade", "type": "GRADE" }, "operator": "GE", "value": "B" }] } }, "children": [], "constraint_ids": []
+        }],
+        "constraints": [], "sharing_rules": [],
+        "effects": [{
+          "meta": { "id": "waive_intro", "node_id": "psychology_waiver::waive_intro", "description": "AP score waives intro", "span": { "source_id": "main", "start": { "byte": 33, "line": 4, "column": 1 }, "end": { "byte": 43, "line": 4, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 33, "line": 4, "column": 1 }, "end": { "byte": 43, "line": 4, "column": 11 } }] },
+          "when": { "kind": "FACT_PRESENT", "fact_id": "ap5" }, "kind": "WAIVE", "target_id": "intro"
+        }]
+      },
+      "catalog": { "schema_version": "0.2.0", "credit_scale": 2, "offerings": [], "courses": [
+        { "canonical_course_id": "PSYC2100", "codes": ["PSYC 2100"], "subject": "PSYC", "number": 2100, "suffix": null, "level": 2000, "format": "lecture", "credit_units": 2, "attributes": [], "distributions": ["So"], "language": "English", "group": "social" }
+      ] },
+      "cases": [{
+        "transcript": { "schema_version": "0.2.0", "credit_scale": 2, "attempts": [
+          { "attempt_id": "p21", "canonical_course_id": "PSYC2100", "enrolled_under_code": "PSYC 2100", "term": "2026SP", "academic_level": "junior", "grade": "A", "grading_mode": "letter", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true },
+          { "attempt_id": "p21cr", "canonical_course_id": "PSYC2100", "enrolled_under_code": "PSYC 2100", "term": "2025FA", "academic_level": "junior", "grade": null, "grading_mode": "crdf", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true }
+        ] },
+        "profile": { "schema_version": "0.2.0", "student_id": "psych1", "declared_choices": {}, "facts": [{ "fact_id": "ap5", "fact_type": "ap_psychology_5", "parameters": {}, "witness": { "score": 5, "document": "registrar" } }], "class_year": 2027 },
+        "expected": {
+          "case_id": "psych_ap_waiver", "status": "COMPLETE", "program_complete": true, "choices": {}, "effects": [{ "effect_id": "waive_intro", "target_id": "intro", "witness": "ap5" }],
+          "assignments": [{ "attempt_id": "p21", "requirement_id": "graded_elective", "constraint_ids": [] }],
+          "rejections": [{ "attempt_id": "p21cr", "requirement_id": "graded_elective", "constraint_id": "graded_elective", "reason": "CR/D/F does not satisfy the letter-grade predicate and null grade does not match GE B." }],
+          "requirements": [{ "requirement_id": "intro", "active": true, "q": 1, "lower": 1, "upper": 1, "satisfied": true, "progress": { "numerator": 1, "denominator": 1 } }, { "requirement_id": "graded_elective", "active": true, "q": 1, "lower": 1, "upper": 1, "satisfied": true, "progress": { "numerator": 1, "denominator": 1 } }], "totals": [], "objective": { "satisfied_required_roots": 2, "progress": { "numerator": 0, "denominator": 1 }, "manual_approval_uses": 1 },
+          "trace": [{ "step": 1, "semantic_id": "waive_intro", "result": "applied", "rationale": "The typed AP fact supplies a visible non-course satisfaction witness." }, { "step": 2, "semantic_id": "graded_elective", "result": "p21 selected", "rationale": "Only the letter-graded A attempt satisfies both transcript predicates." }]
+        }
+      }]
+    },
+    {
+      "fixture_id": "mbb_sharing",
+      "patterns": ["P8", "P11", "P17"],
+      "program": {
+        "schema_version": "0.2.0", "program_id": "mbb_sharing", "catalog_year": "2026-2027", "institution_schema": { "id": "https://yale.example/mql/institution", "version": "2026-2027" }, "credit_scale": 2,
+        "sources": [{ "source_id": "main", "path": "fixtures/mbb.mql" }], "choices": [], "facts": [],
+        "requirements": [
+          { "meta": { "id": "major_elective", "node_id": "mbb_sharing::major_elective", "description": "Major elective", "span": { "source_id": "main", "start": { "byte": 0, "line": 1, "column": 1 }, "end": { "byte": 10, "line": 1, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 0, "line": 1, "column": 1 }, "end": { "byte": 10, "line": 1, "column": 11 } }] }, "roles": ["elective"], "obligation": "REQUIRED", "active_when": { "kind": "CONSTANT", "value": true }, "contribution": { "kind": "SLOT", "unit": "SLOTS" }, "lower": { "kind": "FIXED", "value": 1 }, "upper": { "kind": "FIXED", "value": 1 }, "selector": { "kind": "COURSE_LIST", "canonical_course_ids": ["MBIO3500"] }, "children": [], "constraint_ids": [] },
+          { "meta": { "id": "concentration", "node_id": "mbb_sharing::concentration", "description": "Concentration", "span": { "source_id": "main", "start": { "byte": 11, "line": 2, "column": 1 }, "end": { "byte": 21, "line": 2, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 11, "line": 2, "column": 1 }, "end": { "byte": 21, "line": 2, "column": 11 } }] }, "roles": ["concentration"], "obligation": "REQUIRED", "active_when": { "kind": "CONSTANT", "value": true }, "contribution": { "kind": "SLOT", "unit": "SLOTS" }, "lower": { "kind": "FIXED", "value": 1 }, "upper": { "kind": "FIXED", "value": 1 }, "selector": { "kind": "COURSE_LIST", "canonical_course_ids": ["MBIO3500"] }, "children": [], "constraint_ids": [] }
+        ],
+        "constraints": [{ "meta": { "id": "distinct_major_total", "node_id": "mbb_sharing::distinct_major_total", "description": "One distinct major course", "span": { "source_id": "main", "start": { "byte": 22, "line": 3, "column": 1 }, "end": { "byte": 32, "line": 3, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 22, "line": 3, "column": 1 }, "end": { "byte": 32, "line": 3, "column": 11 } }] }, "kind": "TOTAL", "active_when": { "kind": "CONSTANT", "value": true }, "scope": { "kind": "ROLES", "roles": ["elective", "concentration"] }, "minimum": 1, "count": "DISTINCT_ATTEMPTS" }],
+        "sharing_rules": [{ "meta": { "id": "concentration_share", "node_id": "mbb_sharing::concentration_share", "description": "Concentration may share", "span": { "source_id": "main", "start": { "byte": 33, "line": 4, "column": 1 }, "end": { "byte": 43, "line": 4, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 33, "line": 4, "column": 1 }, "end": { "byte": 43, "line": 4, "column": 11 } }] }, "active_when": { "kind": "CONSTANT", "value": true }, "mode": "SHARE", "requirement_ids": ["major_elective", "concentration"] }], "effects": []
+      },
+      "catalog": { "schema_version": "0.2.0", "credit_scale": 2, "offerings": [], "courses": [{ "canonical_course_id": "MBIO3500", "codes": ["MB&B 3500", "MCDB 3500"], "subject": "MB&B", "number": 3500, "suffix": null, "level": 3000, "format": "lecture", "credit_units": 2, "attributes": [], "distributions": ["Sc"], "language": "English", "group": "biochemistry" }] },
+      "cases": [{
+        "transcript": { "schema_version": "0.2.0", "credit_scale": 2, "attempts": [{ "attempt_id": "b35", "canonical_course_id": "MBIO3500", "enrolled_under_code": "MCDB 3500", "term": "2026SP", "academic_level": "junior", "grade": "A", "grading_mode": "letter", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true }] },
+        "profile": { "schema_version": "0.2.0", "student_id": "mbb1", "declared_choices": {}, "facts": [], "class_year": 2027 },
+        "expected": { "case_id": "mbb_shared_complete", "status": "COMPLETE", "program_complete": true, "choices": {}, "effects": [], "assignments": [{ "attempt_id": "b35", "requirement_id": "major_elective", "constraint_ids": ["concentration_share"] }, { "attempt_id": "b35", "requirement_id": "concentration", "constraint_ids": ["concentration_share"] }], "rejections": [], "requirements": [{ "requirement_id": "major_elective", "active": true, "q": 1, "lower": 1, "upper": 1, "satisfied": true, "progress": { "numerator": 1, "denominator": 1 } }, { "requirement_id": "concentration", "active": true, "q": 1, "lower": 1, "upper": 1, "satisfied": true, "progress": { "numerator": 1, "denominator": 1 } }], "totals": [{ "constraint_id": "distinct_major_total", "distinct_attempts": ["b35"], "count": 1, "minimum": 1, "satisfied": true }], "objective": { "satisfied_required_roots": 2, "progress": { "numerator": 0, "denominator": 1 }, "manual_approval_uses": 0 }, "trace": [{ "step": 1, "semantic_id": "concentration_share", "result": "allowed", "rationale": "The attempt enrolled under a cross-list has one canonical identity and may fill both named requirements." }, { "step": 2, "semantic_id": "distinct_major_total", "result": "one", "rationale": "Role-scoped distinct usage counts the shared attempt once." }] }
+      }]
+    },
+    {
+      "fixture_id": "sociology_track",
+      "patterns": ["P10", "P18"],
+      "program": {
+        "schema_version": "0.2.0", "program_id": "sociology_track", "catalog_year": "2026-2027", "institution_schema": { "id": "https://yale.example/mql/institution", "version": "2026-2027" }, "credit_scale": 2,
+        "sources": [{ "source_id": "main", "path": "fixtures/socy.mql" }],
+        "choices": [{ "meta": { "id": "track", "node_id": "sociology_track::track", "description": "Declared track", "span": { "source_id": "main", "start": { "byte": 0, "line": 1, "column": 1 }, "end": { "byte": 10, "line": 1, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 0, "line": 1, "column": 1 }, "end": { "byte": 10, "line": 1, "column": 11 } }] }, "owner": "DECLARED", "value_type": "STRING", "alternatives": ["standard", "intensive"] }], "facts": [],
+        "requirements": [
+          { "meta": { "id": "standard_methods", "node_id": "sociology_track::standard_methods", "description": "Standard methods", "span": { "source_id": "main", "start": { "byte": 11, "line": 2, "column": 1 }, "end": { "byte": 21, "line": 2, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 11, "line": 2, "column": 1 }, "end": { "byte": 21, "line": 2, "column": 11 } }] }, "roles": ["core"], "obligation": "REQUIRED", "active_when": { "kind": "CHOICE_EQUALS", "choice_id": "track", "equals": "standard" }, "contribution": { "kind": "SLOT", "unit": "SLOTS" }, "lower": { "kind": "FIXED", "value": 1 }, "upper": { "kind": "FIXED", "value": 1 }, "selector": { "kind": "COURSE_LIST", "canonical_course_ids": ["SOCY3010"] }, "children": [], "constraint_ids": [] },
+          { "meta": { "id": "intensive_methods", "node_id": "sociology_track::intensive_methods", "description": "Intensive methods", "span": { "source_id": "main", "start": { "byte": 22, "line": 3, "column": 1 }, "end": { "byte": 32, "line": 3, "column": 11 } }, "provenance": [{ "source_id": "main", "start": { "byte": 22, "line": 3, "column": 1 }, "end": { "byte": 32, "line": 3, "column": 11 } }] }, "roles": ["core"], "obligation": "REQUIRED", "active_when": { "kind": "CHOICE_EQUALS", "choice_id": "track", "equals": "intensive" }, "contribution": { "kind": "DISTINCT_ATTEMPTS", "unit": "COURSES" }, "lower": { "kind": "FIXED", "value": 2 }, "upper": { "kind": "FIXED", "value": 2 }, "selector": { "kind": "COURSE_LIST", "canonical_course_ids": ["SOCY3010", "SOCY3020"] }, "children": [], "constraint_ids": [] }
+        ], "constraints": [], "sharing_rules": [], "effects": []
+      },
+      "catalog": { "schema_version": "0.2.0", "credit_scale": 2, "offerings": [], "courses": [{ "canonical_course_id": "SOCY3010", "codes": ["SOCY 3010"], "subject": "SOCY", "number": 3010, "suffix": null, "level": 3000, "format": "seminar", "credit_units": 2, "attributes": [], "distributions": ["So"], "language": "English", "group": "methods" }] },
+      "cases": [{
+        "transcript": { "schema_version": "0.2.0", "credit_scale": 2, "attempts": [{ "attempt_id": "s301", "canonical_course_id": "SOCY3010", "enrolled_under_code": "SOCY 3010", "term": "2026SP", "academic_level": "junior", "grade": "A", "grading_mode": "letter", "earned_credit_units": 2, "source": "Yale", "credit_bearing": true }] },
+        "profile": { "schema_version": "0.2.0", "student_id": "socy1", "declared_choices": {}, "facts": [], "class_year": 2027 },
+        "expected": { "case_id": "sociology_missing_track", "status": "INDETERMINATE", "program_complete": null, "choices": {}, "effects": [], "assignments": [], "rejections": [], "requirements": [{ "requirement_id": "standard_methods", "active": false, "q": 0, "lower": 1, "upper": 1, "satisfied": false, "progress": { "numerator": 0, "denominator": 1 } }, { "requirement_id": "intensive_methods", "active": false, "q": 0, "lower": 2, "upper": 2, "satisfied": false, "progress": { "numerator": 0, "denominator": 1 } }], "totals": [], "objective": { "satisfied_required_roots": 0, "progress": { "numerator": 0, "denominator": 1 }, "manual_approval_uses": 0 }, "trace": [{ "step": 1, "semantic_id": "track", "result": "missing", "rationale": "A DECLARED choice cannot be selected by the audit; evaluation is indeterminate." }, { "step": 2, "semantic_id": "standard_methods", "result": "inactive", "rationale": "Neither branch activates while the declared choice is unknown." }] }
+      }]
+    }
+  ]
+}

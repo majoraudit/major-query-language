@@ -14,9 +14,8 @@ const CLI_LONG_ABOUT: &str = r#"
 |__/     |__/ \____ $$$|________/
                    \__/          
                                  
-Transform a Major Requirements file (.mql) to its corresponding JSON.
-This is useful when drawing up the requirements for the permutations 
-of the ~80 Yale majors.
+Parse legacy Major Requirements files or validate normative MQL 0.2
+semantic IR JSON. Degree auditing and planning are not performed by this CLI.
 
 * You can find the .mql specification at 
   https://github.com/mrodz/major-requirement-parser/tree/main
@@ -38,6 +37,10 @@ pub(crate) struct Args {
     #[arg(long = "var", short = 'D', value_name = "NAME=EXPR")]
     vars: Vec<String>,
 
+    /// Validate and canonicalize an MQL 0.2 semantic IR JSON document.
+    #[arg(long, conflicts_with = "vars")]
+    validate_ir: bool,
+
     #[arg(long = "version", short = 'V', action = clap::ArgAction::SetTrue)]
     version: bool,
 }
@@ -57,5 +60,30 @@ impl Args {
 
     pub fn version(&self) -> bool {
         self.version
+    }
+
+    pub fn validate_ir(&self) -> bool {
+        self.validate_ir
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Args;
+    use clap::Parser;
+
+    #[test]
+    fn accepts_semantic_ir_validation_mode() {
+        let args = Args::try_parse_from(["mql", "--validate-ir", "program.json"]).unwrap();
+        assert!(args.validate_ir());
+        assert_eq!(args.input().unwrap().to_str(), Some("program.json"));
+    }
+
+    #[test]
+    fn semantic_ir_mode_rejects_legacy_external_variables() {
+        assert!(
+            Args::try_parse_from(["mql", "--validate-ir", "program.json", "--var", "COUNT=2",])
+                .is_err()
+        );
     }
 }

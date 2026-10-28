@@ -8,8 +8,6 @@ use std::io::Read;
 use std::time::Instant;
 use std::{fs::File, io::Write};
 
-use libmql;
-
 const EXTENSION: &str = "mql";
 
 fn main() -> Result<()> {
@@ -18,16 +16,21 @@ fn main() -> Result<()> {
     let cli = cli::Args::parse();
 
     if let (true, _) | (_, None) = (cli.version(), cli.input()) {
-        println!("mql cli v{} libmql v{}", env!("CARGO_PKG_VERSION"), libmql::VERSION);
+        println!(
+            "mql cli v{} libmql v{}",
+            env!("CARGO_PKG_VERSION"),
+            libmql::VERSION
+        );
         return Ok(());
     }
 
     let input = cli.input();
     let output = cli.output();
 
-    let Some(EXTENSION) = input.and_then(|x| x.extension()).and_then(|s| s.to_str()) else {
-        bail!("the Major Query Language uses the .mql file extension")
-    };
+    let expected_extension = if cli.validate_ir() { "json" } else { EXTENSION };
+    if input.and_then(|x| x.extension()).and_then(|s| s.to_str()) != Some(expected_extension) {
+        bail!("expected a .{expected_extension} input file")
+    }
 
     if let Some(output_path) = output {
         let Some("json") = output_path.extension().and_then(|s| s.to_str()) else {
@@ -35,13 +38,33 @@ fn main() -> Result<()> {
         };
     }
 
-    let mut input_file = File::open(input.expect("input should not be none")).context("could not open file")?;
+    let mut input_file =
+        File::open(input.expect("input should not be none")).context("could not open file")?;
 
     let mut buf = String::new();
 
     input_file
         .read_to_string(&mut buf)
         .context("file was not UTF-8")?;
+
+    if cli.validate_ir() {
+        let program = libmql::semantic_ir::SemanticProgram::from_json(&buf)?;
+        let rendered = serde_json::to_string_pretty(&program)?;
+        if let Some(output_path) = cli.output() {
+            let mut output_file = File::options()
+                .create(true)
+                .write(true)
+                .truncate(true)
+                .open(output_path)
+                .context("could not get handle to output file")?;
+            output_file
+                .write_all(rendered.as_bytes())
+                .context("could not write output file")?;
+        } else {
+            println!("{rendered}");
+        }
+        return Ok(());
+    }
 
     let mut externals = HashMap::new();
     for raw in cli.vars() {

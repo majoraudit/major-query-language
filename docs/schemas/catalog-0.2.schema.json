@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mql.dev/schema/0.2/catalog.json",
+  "title": "MQL Catalog Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "credit_scale", "courses", "offerings"],
+  "properties": {
+    "schema_version": { "const": "0.2.0" }, "credit_scale": { "type": "integer", "minimum": 1 },
+    "courses": { "type": "array", "items": { "$ref": "#/$defs/course" } }, "offerings": { "type": "array", "items": { "$ref": "#/$defs/offering" } }
+  },
+  "$defs": {
+    "course": {
+      "type": "object", "additionalProperties": true, "required": ["canonical_course_id", "codes", "subject", "number", "level", "format", "credit_units", "attributes", "distributions"],
+      "properties": {
+        "canonical_course_id": { "type": "string" }, "codes": { "type": "array", "items": { "type": "string" }, "minItems": 1, "uniqueItems": true },
+        "subject": { "type": "string" }, "number": { "type": "integer" }, "suffix": { "type": ["string", "null"] }, "level": { "type": "integer" },
+        "format": { "type": "string" }, "credit_units": { "type": "integer", "minimum": 0 }, "attributes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "distributions": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }, "language": { "type": ["string", "null"] }, "group": { "type": ["string", "null"] }
+      }
+    },
+    "offering": {
+      "type": "object", "additionalProperties": true, "required": ["offering_id", "canonical_course_id", "term", "credit_units", "status"],
+      "properties": { "offering_id": { "type": "string" }, "canonical_course_id": { "type": "string" }, "term": { "type": "string" }, "credit_units": { "type": "integer", "minimum": 0 }, "status": { "enum": ["PLANNED", "CONFIRMED", "CANCELLED", "UNKNOWN"] }, "prerequisites": { "type": "object" } }
+    }
+  }
+}

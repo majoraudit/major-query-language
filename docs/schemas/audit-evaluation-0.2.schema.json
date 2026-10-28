@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mql.dev/schema/0.2/audit-evaluation.json",
+  "title": "MQL Audit Expected Result and Normative Trace",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["case_id", "status", "program_complete", "choices", "effects", "assignments", "rejections", "requirements", "totals", "objective", "trace"],
+  "properties": {
+    "case_id": { "type": "string" }, "status": { "enum": ["COMPLETE", "INCOMPLETE", "INDETERMINATE", "INVALID"] }, "program_complete": { "type": ["boolean", "null"] },
+    "choices": { "type": "object" }, "effects": { "type": "array", "items": { "type": "object" } },
+    "assignments": { "type": "array", "items": { "$ref": "#/$defs/assignment" } }, "rejections": { "type": "array", "items": { "$ref": "#/$defs/rejection" } },
+    "requirements": { "type": "array", "items": { "$ref": "#/$defs/result" } }, "totals": { "type": "array", "items": { "type": "object" } },
+    "objective": { "$ref": "#/$defs/objective" }, "alternate_witnesses": { "type": "array", "items": { "type": "object" } },
+    "trace": { "type": "array", "items": { "$ref": "#/$defs/traceEvent" }, "minItems": 1 }
+  },
+  "$defs": {
+    "assignment": { "type": "object", "additionalProperties": false, "required": ["attempt_id", "requirement_id", "constraint_ids"], "properties": { "attempt_id": { "type": "string" }, "requirement_id": { "type": "string" }, "constraint_ids": { "type": "array", "items": { "type": "string" } } } },
+    "rejection": { "type": "object", "additionalProperties": false, "required": ["attempt_id", "requirement_id", "constraint_id", "reason"], "properties": { "attempt_id": { "type": "string" }, "requirement_id": { "type": "string" }, "constraint_id": { "type": "string" }, "reason": { "type": "string" } } },
+    "result": { "type": "object", "additionalProperties": false, "required": ["requirement_id", "active", "q", "lower", "upper", "satisfied", "progress"], "properties": { "requirement_id": { "type": "string" }, "active": { "type": "boolean" }, "q": { "type": "integer", "minimum": 0 }, "lower": { "type": "integer", "minimum": 0 }, "upper": { "type": ["integer", "null"], "minimum": 0 }, "satisfied": { "type": "boolean" }, "progress": { "type": "object", "additionalProperties": false, "required": ["numerator", "denominator"], "properties": { "numerator": { "type": "integer", "minimum": 0 }, "denominator": { "type": "integer", "minimum": 1 } } } } },
+    "objective": { "type": "object", "additionalProperties": false, "required": ["satisfied_required_roots", "progress", "manual_approval_uses"], "properties": { "satisfied_required_roots": { "type": "integer", "minimum": 0 }, "progress": { "$ref": "#/$defs/rational" }, "manual_approval_uses": { "type": "integer", "minimum": 0 } } },
+    "rational": { "type": "object", "additionalProperties": false, "required": ["numerator", "denominator"], "properties": { "numerator": { "type": "integer" }, "denominator": { "type": "integer", "minimum": 1 } } },
+    "traceEvent": { "type": "object", "additionalProperties": false, "required": ["step", "semantic_id", "result", "rationale"], "properties": { "step": { "type": "integer", "minimum": 1 }, "semantic_id": { "type": "string" }, "result": { "type": "string" }, "rationale": { "type": "string" } } }
+  }
+}
