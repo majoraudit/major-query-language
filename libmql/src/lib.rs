@@ -4,7 +4,6 @@ mod yale_departments;
 mod parser;
 pub mod semantic_ir;
 
-#[path = "parser.rs"]
 #[cfg_attr(test, visibility::make(pub))]
 pub mod test_parser {
     pub use super::parser::*;
