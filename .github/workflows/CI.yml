@@ -44,8 +44,10 @@ jobs:
           cargo test -p libmql
           cargo test -p major-requirement-parser-cli
           cargo check -p pylibmql
-      - name: Validate RFC schemas and fixtures
-        run: python scripts/validate_rfc_artifacts.py
+      - name: Validate RFC schemas, fixtures, and compiled MQL 0.2 sources
+        run: |
+          cargo build -p major-requirement-parser-cli
+          python scripts/validate_rfc_artifacts.py --compiler target/debug/mql
 
   linux:
     needs: verify

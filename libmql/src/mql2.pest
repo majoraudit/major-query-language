@@ -1,0 +1,261 @@
+// MQL 0.2 surface grammar. See docs/rfcs/0002-surface-grammar.md.
+//
+// Every construct lowers to exactly one semantic IR node (RFC 0001). Keywords
+// are lowercase and must not run into a following identifier character. Keyword
+// rules are atomic so no whitespace is skipped before the boundary check; the
+// compiler drops their tokens (`is_keyword`).
+
+WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
+COMMENT    = _{ ("//" ~ (!"\n" ~ ANY)*) | ("/*" ~ (!"*/" ~ ANY)* ~ "*/") }
+
+ident_char = _{ ASCII_ALPHANUMERIC | "_" }
+
+// ---------------------------------------------------------------- keywords --
+
+kw_program      = @{ "program" ~ !ident_char }
+kw_catalog      = @{ "catalog" ~ !ident_char }
+kw_institution  = @{ "institution" ~ !ident_char }
+kw_credit_scale = @{ "credit_scale" ~ !ident_char }
+kw_choice       = @{ "choice" ~ !ident_char }
+kw_one          = @{ "one" ~ !ident_char }
+kw_of           = @{ "of" ~ !ident_char }
+kw_fact         = @{ "fact" ~ !ident_char }
+kw_requirement  = @{ "requirement" ~ !ident_char }
+kw_requirements = @{ "requirements" ~ !ident_char }
+kw_when         = @{ "when" ~ !ident_char }
+kw_where        = @{ "where" ~ !ident_char }
+kw_from         = @{ "from" ~ !ident_char }
+kw_each         = @{ "each" ~ !ident_char }
+kw_at           = @{ "at" ~ !ident_char }
+kw_least        = @{ "least" ~ !ident_char }
+kw_most         = @{ "most" ~ !ident_char }
+kw_exactly      = @{ "exactly" ~ !ident_char }
+kw_between      = @{ "between" ~ !ident_char }
+kw_and          = @{ "and" ~ !ident_char }
+kw_or           = @{ "or" ~ !ident_char }
+kw_not          = @{ "not" ~ !ident_char }
+kw_in           = @{ "in" ~ !ident_char }
+kw_is           = @{ "is" ~ !ident_char }
+kw_constraint   = @{ "constraint" ~ !ident_char }
+kw_group        = @{ "group" ~ !ident_char }
+kw_distinct     = @{ "distinct" ~ !ident_char }
+kw_per          = @{ "per" ~ !ident_char }
+kw_limit        = @{ "limit" ~ !ident_char }
+kw_total        = @{ "total" ~ !ident_char }
+kw_repeat       = @{ "repeat" ~ !ident_char }
+kw_times        = @{ "times" ~ !ident_char }
+kw_order        = @{ "order" ~ !ident_char }
+kw_before       = @{ "before" ~ !ident_char }
+kw_all          = @{ "all" ~ !ident_char }
+kw_effect       = @{ "effect" ~ !ident_char }
+kw_set          = @{ "set" ~ !ident_char }
+kw_to           = @{ "to" ~ !ident_char }
+kw_with         = @{ "with" ~ !ident_char }
+kw_match        = @{ "match" ~ !ident_char }
+kw_credit_word  = @{ ("credits" | "credit") ~ !ident_char }
+kw_canonical    = @{ "canonical" ~ !ident_char }
+kw_direct        = @{ "direct" ~ !ident_char }
+kw_subtree       = @{ "subtree" ~ !ident_char }
+kw_roles         = @{ "roles" ~ !ident_char }
+kw_branch        = @{ "branch" ~ !ident_char }
+kw_waive         = @{ "waive" ~ !ident_char }
+kw_activate      = @{ "activate" ~ !ident_char }
+kw_deactivate    = @{ "deactivate" ~ !ident_char }
+kw_substitute    = @{ "substitute" ~ !ident_char }
+kw_make          = @{ "make" ~ !ident_char }
+kw_permit        = @{ "permit" ~ !ident_char }
+
+reserved = _{
+    ("and" | "or" | "not" | "true" | "false" | "null" | "fact" | "in" | "is"
+     | "where" | "from" | "when" | "before" | "match") ~ !ident_char
+}
+
+// ---------------------------------------------------------------- literals --
+
+ident   = @{ !reserved ~ (ASCII_ALPHA | "_") ~ ident_char* }
+string  = ${ "\"" ~ string_inner ~ "\"" }
+string_inner = @{ ("\\\"" | "\\\\" | (!("\"" | "\\" | "\n") ~ ANY))* }
+integer = @{ "-"? ~ ASCII_DIGIT+ }
+number  = @{ ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
+boolean_true  = @{ "true" ~ !ident_char }
+boolean_false = @{ "false" ~ !ident_char }
+null    = @{ "null" ~ !ident_char }
+scalar  = { string | boolean_true | boolean_false | integer }
+value   = { value_list | null | scalar }
+value_list = { "[" ~ (value_item ~ ("," ~ value_item)* ~ ","?)? ~ "]" }
+value_item = { null | scalar }
+description = { string }
+id_list = { "[" ~ (ident ~ ("," ~ ident)* ~ ","?)? ~ "]" }
+
+// ----------------------------------------------------------------- program --
+
+file = { SOI ~ header ~ item* ~ EOI }
+
+header        = { kw_program ~ ident ~ "{" ~ header_entry* ~ "}" }
+header_entry  = _{ catalog_entry | institution_entry | scale_entry }
+catalog_entry = { kw_catalog ~ catalog_year }
+catalog_year  = @{ ASCII_DIGIT{4} ~ "-" ~ ASCII_DIGIT{4} }
+institution_entry = { kw_institution ~ string ~ "@" ~ string }
+scale_entry   = { kw_credit_scale ~ integer }
+
+item = _{ choice_decl | fact_decl | requirement | constraint_decl | share_decl | effect_decl }
+
+// ------------------------------------------------------------ choices/facts --
+
+choice_decl  = { kw_choice ~ ident ~ description? ~ ":" ~ choice_owner ~ kw_one ~ kw_of
+                 ~ scalar ~ ("," ~ scalar)* ~ ";" }
+choice_owner = { owner_declared | owner_solver | owner_planning | owner_fact }
+owner_declared = @{ "declared" ~ !ident_char }
+owner_solver   = @{ "solver" ~ !ident_char }
+owner_planning = @{ "planning" ~ !ident_char }
+owner_fact     = { kw_fact ~ ident }
+
+fact_decl   = { kw_fact ~ ident ~ description? ~ ":" ~ approval? ~ ident ~ fact_params? ~ ";" }
+approval    = @{ "approval" ~ !ident_char }
+fact_params = { "{" ~ (fact_param ~ ("," ~ fact_param)* ~ ","?)? ~ "}" }
+fact_param  = { ident ~ ":" ~ scalar }
+
+// ------------------------------------------------------------ requirements --
+
+requirement = { obligation? ~ kw_requirement ~ ident ~ description? ~ roles? ~ when_clause?
+                ~ "{" ~ requirement_item* ~ "}" }
+obligation  = { ob_required | ob_optional | ob_advisory }
+ob_required = @{ "required" ~ !ident_char }
+ob_optional = @{ "optional" ~ !ident_char }
+ob_advisory = @{ "advisory" ~ !ident_char }
+roles       = { id_list }
+when_clause = { kw_when ~ condition }
+
+requirement_item = _{ count_stmt | requirement | constraint_decl }
+
+count_stmt = { count_kind ~ bounds? ~ selector? ~ each_clause? ~ ";" }
+count_kind = { ck_slots | ck_canonical | ck_courses | ck_credits | ck_assignments | ck_children }
+ck_slots       = @{ ("slots" | "slot") ~ !ident_char }
+ck_canonical   = { kw_canonical ~ ck_courses }
+ck_courses     = @{ ("courses" | "course") ~ !ident_char }
+ck_credits     = @{ ("credits" | "credit") ~ !ident_char }
+ck_assignments = @{ ("assignments" | "assignment") ~ !ident_char }
+ck_children    = @{ "children" ~ !ident_char }
+
+bounds     = { b_exactly | b_at_least | b_at_most | b_between }
+b_exactly  = { kw_exactly ~ amount }
+b_at_least = { kw_at ~ kw_least ~ amount }
+b_at_most  = { kw_at ~ kw_most ~ amount }
+b_between  = { kw_between ~ amount ~ kw_and ~ amount }
+amount     = { number | choice_table }
+choice_table = { "(" ~ ident ~ ":" ~ table_case ~ ("," ~ table_case)* ~ ","? ~ ")" }
+table_case = { scalar ~ "=>" ~ number }
+
+selector     = { (kw_from ~ (requirement_list | course_list)) | where_pred }
+course_list  = { "[" ~ (course ~ ("," ~ course)* ~ ","?)? ~ "]" }
+course       = { course_code | string }
+course_code  = ${ department ~ " "* ~ course_number }
+department   = @{ (ASCII_ALPHA_UPPER | "&"){2,5} }
+course_number = @{ ASCII_DIGIT{3,4} ~ ASCII_ALPHA_UPPER? }
+requirement_list = { kw_requirements ~ id_list }
+where_pred   = { kw_where ~ predicate }
+each_clause  = { kw_each ~ number ~ kw_credit_word }
+
+// ------------------------------------------------------------- constraints --
+
+constraint_decl = { kw_constraint ~ ident ~ description? ~ when_clause? ~ scope_clause?
+                    ~ ":" ~ constraint_body ~ ";" }
+scope_clause = { kw_in ~ scope }
+scope        = { s_direct | s_subtree | s_requirements | s_roles | s_branch | s_program }
+s_direct       = { kw_direct ~ ident }
+s_subtree      = { kw_subtree ~ ident }
+s_requirements = { kw_requirements ~ id_list }
+s_roles        = { kw_roles ~ id_list }
+s_branch       = { kw_branch ~ ident ~ "=" ~ scalar }
+s_program      = { kw_program }
+
+constraint_body = { c_group | c_limit | c_total | c_repeat | c_order | c_all | c_selected }
+
+c_group    = { kw_group ~ field_ref ~ group_mode }
+group_mode = { g_distinct_at_least | g_distinct_exactly | g_same | g_at_most_per | g_at_least_per }
+g_distinct_at_least = { kw_distinct ~ kw_at ~ kw_least ~ number }
+g_distinct_exactly  = { kw_distinct ~ kw_exactly ~ number }
+g_same              = @{ "same" ~ !ident_char }
+g_at_most_per       = { kw_at ~ kw_most ~ number ~ kw_per ~ kw_group }
+g_at_least_per      = { kw_at ~ kw_least ~ number ~ kw_per ~ kw_group }
+
+c_limit    = { kw_limit ~ number ~ set_unit ~ kw_where ~ predicate }
+c_total    = { kw_total ~ kw_at ~ kw_least ~ number ~ set_unit ~ (kw_where ~ predicate)? }
+c_repeat   = { kw_repeat ~ kw_at ~ kw_most ~ number ~ kw_times ~ kw_where ~ predicate }
+c_order    = { kw_order ~ predicate ~ kw_before ~ predicate }
+c_all      = { kw_all ~ kw_where ~ predicate }
+c_selected = { comparison ~ number ~ set_unit ~ kw_where ~ predicate }
+comparison = { cmp_at_least | cmp_at_most | cmp_exactly }
+cmp_at_least = { kw_at ~ kw_least }
+cmp_at_most  = { kw_at ~ kw_most }
+cmp_exactly  = { kw_exactly }
+
+set_unit = { u_canonical | u_attempts | u_credits | u_assignments }
+u_canonical   = { kw_canonical ~ ck_courses }
+u_attempts    = @{ ("attempts" | "attempt") ~ !ident_char }
+u_credits     = @{ ("credits" | "credit") ~ !ident_char }
+u_assignments = @{ ("assignments" | "assignment") ~ !ident_char }
+
+// --------------------------------------------------------- sharing/effects --
+
+share_decl = { share_mode ~ ident ~ description? ~ when_clause? ~ ":" ~ ident ~ ("," ~ ident)* ~ ";" }
+share_mode = { mode_share | mode_exclusive }
+mode_share     = @{ "share" ~ !ident_char }
+mode_exclusive = @{ "exclusive" ~ !ident_char }
+
+effect_decl   = { kw_effect ~ ident ~ description? ~ kw_when ~ condition ~ ":" ~ effect_action ~ ";" }
+effect_action = { e_waive | e_activate | e_deactivate | e_set_bound | e_substitute | e_make | e_permit }
+e_waive      = { kw_waive ~ ident }
+e_activate   = { kw_activate ~ ident }
+e_deactivate = { kw_deactivate ~ ident }
+e_set_bound  = { kw_set ~ bound_side ~ kw_of ~ ident ~ kw_to ~ number }
+bound_side   = { side_lower | side_upper }
+side_lower   = @{ "lower" ~ !ident_char }
+side_upper   = @{ "upper" ~ !ident_char }
+e_substitute = { kw_substitute ~ ident ~ kw_with ~ ident }
+e_make       = { kw_make ~ ident ~ obligation }
+e_permit     = { kw_permit ~ ident ~ kw_where ~ predicate }
+
+// --------------------------------------------------------------- conditions --
+
+condition = { cond_and ~ (kw_or ~ cond_and)* }
+cond_and  = { cond_not ~ (kw_and ~ cond_not)* }
+cond_not  = { negation | cond_atom }
+negation  = { kw_not ~ cond_not }
+cond_atom = _{ ("(" ~ condition ~ ")") | boolean_true | boolean_false | cond_fact | cond_choice }
+cond_fact = { kw_fact ~ ident }
+cond_choice = { ident ~ equality_op ~ scalar }
+equality_op = { op_ne | op_eq }
+
+// --------------------------------------------------------------- predicates --
+
+predicate = { pred_and ~ (kw_or ~ pred_and)* }
+pred_and  = { pred_not ~ (kw_and ~ pred_not)* }
+pred_not  = { pred_negation | pred_atom }
+pred_negation = { kw_not ~ pred_not }
+pred_atom = _{ ("(" ~ predicate ~ ")") | pred_is | pred_compare }
+pred_is   = { field_ref ~ kw_is ~ (is_null | is_unknown) }
+is_null    = @{ "null" ~ !ident_char }
+is_unknown = @{ "unknown" ~ !ident_char }
+pred_compare = { field_ref ~ compare_op ~ value ~ code_match? }
+compare_op = { op_le | op_ge | op_ne | op_eq | op_lt | op_gt | op_in | op_contains | op_overlaps }
+op_le = { "<=" }
+op_ge = { ">=" }
+op_ne = { "!=" }
+op_eq = { "=" }
+op_lt = { "<" }
+op_gt = { ">" }
+op_in = @{ "in" ~ !ident_char }
+op_contains = @{ "contains" ~ !ident_char }
+op_overlaps = @{ "overlaps" ~ !ident_char }
+code_match = { kw_match ~ (match_canonical | match_enrolled | match_either) }
+match_canonical = @{ "canonical" ~ !ident_char }
+match_enrolled  = @{ "enrolled_as" ~ !ident_char }
+match_either    = @{ "either" ~ !ident_char }
+
+field_ref = ${ record_target ~ "." ~ ident }
+record_target = { t_course | t_offering | t_attempt | t_student }
+t_course   = { "course" }
+t_offering = { "offering" }
+t_attempt  = { "attempt" }
+t_student  = { "student" }

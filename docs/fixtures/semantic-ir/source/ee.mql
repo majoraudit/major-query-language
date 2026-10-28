@@ -1,0 +1,12 @@
+program ee_electives {
+  catalog 2026-2027
+  institution "https://yale.example/mql/institution" @ "2026-2027"
+  credit_scale 2
+}
+
+requirement electives "Four electives, three advanced" [elective] {
+  courses exactly 4 where course.subject = "ECE" and course.format != "research";
+
+  constraint three_advanced "At least three at level 4000":
+    at least 3 attempts where course.level >= 4000;
+}

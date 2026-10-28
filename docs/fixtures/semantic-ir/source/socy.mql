@@ -1,0 +1,16 @@
+// The student declares a track in their profile.
+program sociology_track {
+  catalog 2026-2027
+  institution "https://yale.example/mql/institution" @ "2026-2027"
+  credit_scale 2
+}
+
+choice track "Declared track": declared one of "standard", "intensive";
+
+requirement standard_methods "Standard methods" [core] when track = "standard" {
+  slot from [SOCY 3010];
+}
+
+requirement intensive_methods "Intensive methods" [core] when track = "intensive" {
+  courses exactly 2 from [SOCY 3010, SOCY 3020];
+}

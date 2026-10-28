@@ -1,0 +1,140 @@
+{
+  "schema_id": "https://yale.example/mql/institution",
+  "version": "2026-2027",
+  "normalization": {
+    "strings": "NFC"
+  },
+  "fields": [
+    {
+      "target": "CATALOG_COURSE",
+      "name": "level",
+      "type": "INTEGER",
+      "nullable": false,
+      "operators": [
+        "EQ",
+        "GE",
+        "LE"
+      ]
+    },
+    {
+      "target": "CATALOG_COURSE",
+      "name": "subject",
+      "type": "STRING",
+      "nullable": false,
+      "operators": [
+        "EQ",
+        "IN"
+      ]
+    },
+    {
+      "target": "CATALOG_COURSE",
+      "name": "format",
+      "type": "ENUM",
+      "nullable": false,
+      "enum_name": "course_format",
+      "operators": [
+        "EQ",
+        "NE",
+        "IN"
+      ]
+    },
+    {
+      "target": "CATALOG_COURSE",
+      "name": "group",
+      "type": "STRING",
+      "nullable": true,
+      "operators": [
+        "EQ",
+        "IS_NULL",
+        "IS_UNKNOWN"
+      ]
+    },
+    {
+      "target": "TRANSCRIPT_ATTEMPT",
+      "name": "grade",
+      "type": "GRADE",
+      "nullable": true,
+      "operators": [
+        "EQ",
+        "GE",
+        "IS_NULL"
+      ]
+    },
+    {
+      "target": "TRANSCRIPT_ATTEMPT",
+      "name": "grading_mode",
+      "type": "ENUM",
+      "nullable": false,
+      "enum_name": "grading_mode",
+      "operators": [
+        "EQ",
+        "NE"
+      ]
+    },
+    {
+      "target": "TRANSCRIPT_ATTEMPT",
+      "name": "source",
+      "type": "ENUM",
+      "nullable": false,
+      "enum_name": "source",
+      "operators": [
+        "EQ",
+        "IN"
+      ]
+    }
+  ],
+  "enums": {
+    "course_format": [
+      "lecture",
+      "seminar",
+      "lab",
+      "research"
+    ],
+    "grading_mode": [
+      "letter",
+      "crdf"
+    ],
+    "source": [
+      "Yale",
+      "study_abroad",
+      "transfer",
+      "summer"
+    ]
+  },
+  "grade_order": [
+    "F",
+    "D",
+    "C",
+    "B",
+    "A"
+  ],
+  "joins": [
+    {
+      "from_target": "TRANSCRIPT_ATTEMPT",
+      "from_field": "canonical_course_id",
+      "to_target": "CATALOG_COURSE",
+      "to_field": "canonical_course_id"
+    }
+  ],
+  "facts": [
+    {
+      "name": "ap_psychology_5",
+      "approval": false,
+      "parameters": {}
+    },
+    {
+      "name": "dus_substitution",
+      "approval": true,
+      "parameters": {
+        "for": "requirement_id"
+      }
+    }
+  ],
+  "department_aliases": {
+    "EENG": "ECE"
+  },
+  "tag_values": [
+    "YC CPSC Elective",
+    "YC HIST Preindustrial"
+  ]
+}

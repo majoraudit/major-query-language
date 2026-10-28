@@ -49,5 +49,5 @@ One known difference remains. JSON Schema treats an integral number such as `2.0
 
 The Rust IR types, JSON deserialization, semantic reference validation, Python binding, and CLI validation mode are implemented. Their unit tests load these normative fixtures directly.
 
-The MQL 0.2 surface grammar, degree-audit evaluator, CP-SAT compiler, and planning engine remain outside this implementation. The legacy 0.1 parser continues to operate independently until the grammar RFC is approved.
+The MQL 0.2 surface grammar is implemented by [RFC 0002](0002-surface-grammar.md). The eight fixtures are also provided as source under `fixtures/semantic-ir/source/`; running `scripts/validate_rfc_artifacts.py --compiler <mql>` compiles them and validates the output against the IR schema. The degree-audit evaluator, CP-SAT compiler, and planning engine remain outside this implementation. The legacy 0.1 parser continues to operate independently.
 

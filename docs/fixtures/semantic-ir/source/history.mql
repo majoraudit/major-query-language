@@ -1,0 +1,23 @@
+// One course may count toward all three requirements.
+program history_sharing {
+  catalog 2026-2027
+  institution "https://yale.example/mql/institution" @ "2026-2027"
+  credit_scale 2
+}
+
+requirement regions "Regions" [core] {
+  courses exactly 1 from [HIST 3100];
+}
+
+requirement preindustrial "Preindustrial" [core] {
+  courses exactly 1 from [HIST 3100];
+}
+
+requirement seminars "Seminars" [senior] {
+  courses exactly 1 from [HIST 3100];
+}
+
+share hist_share "Three-way sharing": regions, preindustrial, seminars;
+
+constraint major_total "Two distinct credits overall in reduced fixture" in program:
+  total at least 2 credits;

@@ -1,6 +1,6 @@
 [package]
 name = "major-requirement-parser-cli"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2024"
 description = "Command-line parser and semantic IR validator for MQL"
 repository = "https://github.com/mrodz/major-requirement-parser"

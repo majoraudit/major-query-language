@@ -1,0 +1,12 @@
+program chemistry_credits {
+  catalog 2026-2027
+  institution "https://yale.example/mql/institution" @ "2026-2027"
+  credit_scale 2
+}
+
+// Credits are written in course credits; credit_scale 2 stores 4 credits as 8 units.
+requirement advanced "Four advanced credits" [elective] {
+  credits at least 4 from [CHEM 4000, CHEM 4100, CHEM 4900];
+  constraint research_repeat "Research counts at most twice":
+    repeat at most 2 times where course.subject = "CHEM";
+}
