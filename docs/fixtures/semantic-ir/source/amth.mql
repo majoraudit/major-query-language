@@ -1,0 +1,15 @@
+program applied_math_groups {
+  catalog 2026-2027
+  institution "https://yale.example/mql/institution" @ "2026-2027"
+  credit_scale 2
+}
+
+requirement breadth "Three breadth areas" [elective] {
+  courses exactly 3 from [AMTH 3100, AMTH 3200, AMTH 3300];
+  constraint distinct_areas "Distinct areas": group course.group distinct at least 3;
+}
+
+requirement concentration "Two courses in one area" [concentration] {
+  courses exactly 2 from [AMTH 4100, AMTH 4200];
+  constraint same_area "Same concentration area": group course.group same;
+}

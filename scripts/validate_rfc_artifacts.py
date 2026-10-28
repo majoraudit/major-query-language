@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
-"""Validate the RFC schemas, positive fixtures, and schema-negative cases."""
+"""Validate the RFC schemas, positive fixtures, and schema-negative cases.
+
+With `--compiler PATH` (the `mql` binary), also compile every MQL 0.2 fixture
+source and validate the emitted IR against the normative schema.
+"""
 
 from __future__ import annotations
 
+import argparse
 import copy
 import json
+import subprocess
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -59,6 +66,9 @@ def validate(schema: dict[str, Any], value: Any, label: str) -> None:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--compiler", type=Path, help="path to the mql binary")
+    compiler = parser.parse_args().compiler
     schema_names = [
         "institution-schema",
         "mql-ir",
@@ -96,6 +106,24 @@ def main() -> None:
         assert any(case["expected_message_contains"] in error.message for error in errors), case["case_id"]
 
     print("validated 7 schemas, 8 fixture families, and 4 negative schema cases")
+
+    if compiler is not None:
+        with tempfile.TemporaryDirectory() as scratch:
+            institution = Path(scratch) / "institution.json"
+            institution.write_text(json.dumps(fixture_document["institution"]), encoding="utf-8")
+            sources = sorted((FIXTURES / "source").glob("*.mql"))
+            assert len(sources) == 8, sources
+            for source in sources:
+                result = subprocess.run(
+                    [compiler, "--compile", str(source), "--institution", str(institution)],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+                if result.returncode != 0:
+                    raise AssertionError(f"{source.name} failed to compile:\n{result.stderr}")
+                validate(schemas["mql-ir"], json.loads(result.stdout), f"compiled {source.name}")
+        print(f"compiled {len(sources)} MQL 0.2 sources to schema-valid IR")
 
 
 if __name__ == "__main__":

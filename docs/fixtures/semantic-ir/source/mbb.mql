@@ -1,0 +1,18 @@
+program mbb_sharing {
+  catalog 2026-2027
+  institution "https://yale.example/mql/institution" @ "2026-2027"
+  credit_scale 2
+}
+
+requirement major_elective "Major elective" [elective] {
+  slot from [MBIO 3500];
+}
+
+requirement concentration "Concentration" [concentration] {
+  slot from [MBIO 3500];
+}
+
+share concentration_share "Concentration may share": major_elective, concentration;
+
+constraint distinct_major_total "One distinct major course" in roles [elective, concentration]:
+  total at least 1 attempts;

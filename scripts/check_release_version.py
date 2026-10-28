@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Ensure every published component and the semantic schema share one version."""
+"""Ensure every published component shares one version and the IR matches its schema."""
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 import tomllib
@@ -27,10 +28,16 @@ def main() -> None:
         raise SystemExit(f"release versions disagree: {versions}")
 
     version = next(iter(versions.values()))
+
+    # The IR wire version moves independently of the package (RFC 0001 §2),
+    # but the Rust constant and the normative schema must agree.
     semantic_source = (ROOT / "libmql/src/semantic_ir.rs").read_text(encoding="utf-8")
     match = re.search(r'SEMANTIC_IR_VERSION:\s*&str\s*=\s*"([^"]+)"', semantic_source)
-    if match is None or match.group(1) != version:
-        raise SystemExit(f"semantic IR version does not match package {version}")
+    schema = json.loads((ROOT / "docs/schemas/mql-ir-0.2.schema.json").read_text(encoding="utf-8"))
+    schema_version = schema["properties"]["schema_version"]["const"]
+    if match is None or match.group(1) != schema_version:
+        found = match.group(1) if match else None
+        raise SystemExit(f"SEMANTIC_IR_VERSION {found} does not match schema {schema_version}")
 
     expected_tag = f"v{version}"
     if len(sys.argv) > 1 and sys.argv[1] != expected_tag:

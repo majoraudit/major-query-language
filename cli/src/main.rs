@@ -49,21 +49,24 @@ fn main() -> Result<()> {
 
     if cli.validate_ir() {
         let program = libmql::semantic_ir::SemanticProgram::from_json(&buf)?;
-        let rendered = serde_json::to_string_pretty(&program)?;
-        if let Some(output_path) = cli.output() {
-            let mut output_file = File::options()
-                .create(true)
-                .write(true)
-                .truncate(true)
-                .open(output_path)
-                .context("could not get handle to output file")?;
-            output_file
-                .write_all(rendered.as_bytes())
-                .context("could not write output file")?;
-        } else {
-            println!("{rendered}");
-        }
-        return Ok(());
+        return write_ir(&program, output);
+    }
+
+    if cli.compile() {
+        let institution = match cli.institution() {
+            Some(path) => {
+                let text = std::fs::read_to_string(path)
+                    .with_context(|| format!("could not read institution schema {path:?}"))?;
+                Some(
+                    libmql::institution::Institution::from_json(&text)
+                        .with_context(|| format!("invalid institution schema {path:?}"))?,
+                )
+            }
+            None => None,
+        };
+        let path = input.expect("input should not be none").to_string_lossy();
+        let program = libmql::compiler::compile(&buf, &path, institution.as_ref())?;
+        return write_ir(&program, output);
     }
 
     let mut externals = HashMap::new();
@@ -101,5 +104,26 @@ fn main() -> Result<()> {
         println!("{}", result.to_string_pretty()?);
     }
 
+    Ok(())
+}
+
+fn write_ir(
+    program: &libmql::semantic_ir::SemanticProgram,
+    output: Option<&std::path::Path>,
+) -> Result<()> {
+    let rendered = serde_json::to_string_pretty(program)?;
+    if let Some(output_path) = output {
+        let mut output_file = File::options()
+            .create(true)
+            .write(true)
+            .truncate(true)
+            .open(output_path)
+            .context("could not get handle to output file")?;
+        output_file
+            .write_all(rendered.as_bytes())
+            .context("could not write output file")?;
+    } else {
+        println!("{rendered}");
+    }
     Ok(())
 }

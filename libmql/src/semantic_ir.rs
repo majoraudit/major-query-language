@@ -125,7 +125,7 @@ pub struct SchemaRef {
 pub struct SourceDocument {
     pub source_id: String,
     pub path: String,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub digest: Option<String>,
 }
 
@@ -233,7 +233,7 @@ pub enum ContributionUnit {
 pub struct Contribution {
     pub kind: ContributionKind,
     pub unit: ContributionUnit,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fixed_credit_units: Option<u64>,
 }
 
@@ -310,7 +310,7 @@ pub struct FieldRef {
     pub field: String,
     #[serde(rename = "type")]
     pub field_type: FieldType,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub course_code_match: Option<CourseCodeMatch>,
 }
 
@@ -375,15 +375,15 @@ pub enum ScopeKind {
 #[serde(deny_unknown_fields)]
 pub struct Scope {
     pub kind: ScopeKind,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub requirement_id: Option<String>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub requirement_ids: Vec<String>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub roles: Vec<String>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub choice_id: Option<String>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub branch: Option<String>,
 }
 
@@ -421,7 +421,7 @@ pub enum Constraint {
         scope: Scope,
         minimum: u64,
         count: TotalCount,
-        #[serde(default)]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         predicate: Option<Predicate>,
     },
     Repeat {
@@ -482,7 +482,7 @@ pub enum CardinalityComparison {
     Exactly,
     All,
 }
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum CountUnit {
     Attempts,
@@ -531,7 +531,7 @@ pub struct Choice {
     pub owner: ChoiceOwner,
     pub value_type: ChoiceValueType,
     pub alternatives: Vec<ScalarValue>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fact_id: Option<String>,
 }
 
@@ -568,17 +568,17 @@ pub struct Effect {
     pub when: Condition,
     pub kind: EffectKind,
     pub target_id: String,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub active: Option<bool>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub bound: Option<BoundSide>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub value: Option<u64>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub replacement_id: Option<String>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub obligation: Option<Obligation>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub predicate: Option<Predicate>,
 }
 
@@ -1187,6 +1187,17 @@ impl<'a> Validator<'a> {
 
     fn validate_constraint_payload(&mut self, constraint: &Constraint) {
         let owner = &constraint.meta().id;
+        if let Constraint::SelectedSet {
+            unit: CountUnit::Assignments,
+            ..
+        } = constraint
+        {
+            self.error(
+                "MQL0224_INCOMPATIBLE_UNIT",
+                Some(owner.clone()),
+                "selected-set constraints count attempts, canonical courses, or credit units",
+            );
+        }
         match constraint {
             Constraint::SelectedSet { predicate, .. }
             | Constraint::Limit { predicate, .. }

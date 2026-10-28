@@ -10,7 +10,7 @@
 
 This RFC defines the normative, solver-independent semantic intermediate representation (IR) for MQL 0.2. It replaces the consumer-defined meaning of the 0.1 selector tree with versioned data whose counting, activation, scope, sharing, and explanation behavior is explicit.
 
-This RFC does not define surface MQL syntax, a parser implementation, a solver, or multi-term planning. The future grammar is one producer of this IR. A conforming audit engine consumes the IR, institution schema, catalog, transcript, and profile without reading source comments or Yale prose.
+This RFC does not define surface MQL syntax, a parser implementation, a solver, or multi-term planning. The surface grammar in [RFC 0002](0002-surface-grammar.md) is one producer of this IR. A conforming audit engine consumes the IR, institution schema, catalog, transcript, and profile without reading source comments or Yale prose.
 
 Normative terms MUST, MUST NOT, SHOULD, and MAY have their RFC 2119 meanings.
 

@@ -6,3 +6,5 @@ These fixtures are semantic examples, not reproductions of the complete Yale cat
 
 The cases collectively include complete, incomplete, indeterminate, rejected-assignment, shared-course, inactive-branch, fact-effect, and equal-optimum outcomes. The later conformance suite must split these interactions into isolated positive and negative tests for every P1–P20 pattern.
 
+
+`source/` contains each program as MQL 0.2 source ([RFC 0002](../../rfcs/0002-surface-grammar.md)). Compiling a file with the fixture document's `institution` produces that fixture's `program`, apart from source spans, which are illustrative in the JSON.

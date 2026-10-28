@@ -14,8 +14,9 @@ const CLI_LONG_ABOUT: &str = r#"
 |__/     |__/ \____ $$$|________/
                    \__/          
                                  
-Parse legacy Major Requirements files or validate normative MQL 0.2
-semantic IR JSON. Degree auditing and planning are not performed by this CLI.
+Compile MQL 0.2 programs to semantic IR (--compile), validate semantic IR
+JSON (--validate-ir), or parse legacy 0.1 files (the default). Degree auditing
+and planning are not performed by this CLI.
 
 * You can find the .mql specification at 
   https://github.com/mrodz/major-requirement-parser/tree/main
@@ -41,6 +42,14 @@ pub(crate) struct Args {
     #[arg(long, conflicts_with = "vars")]
     validate_ir: bool,
 
+    /// Compile an MQL 0.2 source file to validated semantic IR JSON.
+    #[arg(long, conflicts_with_all = ["vars", "validate_ir"])]
+    compile: bool,
+
+    /// Institution schema JSON that types predicate fields and checks facts.
+    #[arg(long, value_name = "FILE", requires = "compile")]
+    institution: Option<PathBuf>,
+
     #[arg(long = "version", short = 'V', action = clap::ArgAction::SetTrue)]
     version: bool,
 }
@@ -65,6 +74,14 @@ impl Args {
     pub fn validate_ir(&self) -> bool {
         self.validate_ir
     }
+
+    pub fn compile(&self) -> bool {
+        self.compile
+    }
+
+    pub fn institution(&self) -> Option<&Path> {
+        self.institution.as_deref()
+    }
 }
 
 #[cfg(test)]
@@ -77,6 +94,30 @@ mod tests {
         let args = Args::try_parse_from(["mql", "--validate-ir", "program.json"]).unwrap();
         assert!(args.validate_ir());
         assert_eq!(args.input().unwrap().to_str(), Some("program.json"));
+    }
+
+    #[test]
+    fn accepts_compile_mode_with_institution() {
+        let args = Args::try_parse_from([
+            "mql",
+            "--compile",
+            "program.mql",
+            "--institution",
+            "yale.json",
+        ])
+        .unwrap();
+        assert!(args.compile());
+        assert_eq!(args.institution().unwrap().to_str(), Some("yale.json"));
+    }
+
+    #[test]
+    fn institution_requires_compile_mode() {
+        assert!(
+            Args::try_parse_from(["mql", "program.mql", "--institution", "yale.json"]).is_err()
+        );
+        assert!(
+            Args::try_parse_from(["mql", "--compile", "--validate-ir", "program.mql"]).is_err()
+        );
     }
 
     #[test]

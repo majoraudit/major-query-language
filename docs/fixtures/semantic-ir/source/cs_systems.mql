@@ -1,0 +1,20 @@
+// A solver picks the systems sequence; the elective count depends on it.
+program cs_systems {
+  catalog 2026-2027
+  institution "https://yale.example/mql/institution" @ "2026-2027"
+  credit_scale 2
+}
+
+choice systems "Systems sequence": solver one of "split", "combined";
+
+requirement systems_split "Split systems sequence" [core] when systems = "split" {
+  courses exactly 2 from [CPSC 3231, CPSC 3232];
+}
+
+requirement systems_combined "Combined systems course" [core] when systems = "combined" {
+  courses exactly 1 from [CPSC 3230];
+}
+
+requirement electives "Electives vary by systems choice" [elective] {
+  courses at least (systems: "split" => 1, "combined" => 2) from [CPSC 3650, CPSC 3660];
+}

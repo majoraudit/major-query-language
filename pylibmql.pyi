@@ -1,6 +1,6 @@
-"""Python bindings for legacy MQL parsing and MQL 0.2 semantic IR validation."""
+"""Python bindings for MQL 0.2 compilation, semantic IR validation, and legacy parsing."""
 
-from typing import Dict
+from typing import Dict, Optional
 
 __version__: str
 
@@ -62,4 +62,19 @@ def parse_extern_value(expr: str) -> str:
 
 def validate_semantic_ir(json: str) -> SemanticIR:
     """Deserialize and semantically validate a versioned MQL 0.2 IR document."""
+    ...
+
+def compile_program(source: str, path: str = "main.mql", institution: Optional[str] = None) -> SemanticIR:
+    """
+    Compile MQL 0.2 source to validated semantic IR.
+
+    Args:
+        source: MQL 0.2 program text
+        path: Source path recorded in the IR's source registry and in diagnostics
+        institution: Institution schema JSON; required when the program uses
+            predicates (`where course.level >= 3000`) or group fields
+
+    Raises:
+        ValueError: listing every diagnostic as `path:line:column: CODE: message`
+    """
     ...

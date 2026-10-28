@@ -278,3 +278,19 @@ fn rust_rejects_every_schema_negative_case() {
         );
     }
 }
+
+/// Canonical output must be the same JSON the schema validated, with absent
+/// optional fields omitted rather than written as `null`.
+#[test]
+fn canonical_serialization_reproduces_every_fixture_exactly() {
+    let document = fixture_document();
+    for fixture in document["fixtures"].as_array().unwrap() {
+        let program = SemanticProgram::from_json(&fixture["program"].to_string()).unwrap();
+        assert_eq!(
+            serde_json::to_value(&program).unwrap(),
+            fixture["program"],
+            "{} changed when re-serialized",
+            fixture["fixture_id"]
+        );
+    }
+}

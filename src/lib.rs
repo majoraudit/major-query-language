@@ -1,5 +1,6 @@
 use libmql::{
-    parse as libmql_parse, parse_extern_value as libmql_parse_extern_value,
+    compiler::compile, institution::Institution, parse as libmql_parse,
+    parse_extern_value as libmql_parse_extern_value,
     parse_with_externals as libmql_parse_with_externals, semantic_ir::SemanticProgram, ParseResult,
 };
 use pyo3::{exceptions::PyValueError, prelude::*};
@@ -94,6 +95,25 @@ fn validate_semantic_ir(json: String) -> PyResult<SemanticIR> {
         .map_err(|e| PyErr::new::<PyValueError, _>(e.to_string()))
 }
 
+#[pyfunction]
+#[pyo3(signature = (source, path = "main.mql", institution = None))]
+fn compile_program(
+    source: String,
+    path: &str,
+    institution: Option<String>,
+) -> PyResult<SemanticIR> {
+    let institution = institution
+        .map(|json| {
+            Institution::from_json(&json).map_err(|e| {
+                PyErr::new::<PyValueError, _>(format!("invalid institution schema: {e}"))
+            })
+        })
+        .transpose()?;
+    compile(&source, path, institution.as_ref())
+        .map(|program| SemanticIR { program })
+        .map_err(|e| PyErr::new::<PyValueError, _>(e.to_string()))
+}
+
 #[pymodule]
 fn pylibmql(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
@@ -101,6 +121,7 @@ fn pylibmql(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(parse_with_externals, m)?)?;
     m.add_function(wrap_pyfunction!(parse_extern_value, m)?)?;
     m.add_function(wrap_pyfunction!(validate_semantic_ir, m)?)?;
+    m.add_function(wrap_pyfunction!(compile_program, m)?)?;
     m.add_class::<MQL>()?;
     m.add_class::<SemanticIR>()?;
     Ok(())

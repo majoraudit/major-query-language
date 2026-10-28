@@ -1,6 +1,8 @@
 mod closest_string;
 mod yale_departments;
 
+pub mod compiler;
+pub mod institution;
 mod parser;
 pub mod semantic_ir;
 

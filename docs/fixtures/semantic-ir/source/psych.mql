@@ -1,0 +1,17 @@
+program psychology_waiver {
+  catalog 2026-2027
+  institution "https://yale.example/mql/institution" @ "2026-2027"
+  credit_scale 2
+}
+
+fact ap5 "AP Psychology score 5": ap_psychology_5;
+
+requirement intro "Introduction to psychology" [prerequisite] {
+  slot from [PSYC 1100];
+}
+
+requirement graded_elective "Letter-graded elective at B or above" [elective] {
+  slot where attempt.grading_mode = "letter" and attempt.grade >= "B";
+}
+
+effect waive_intro "AP score waives intro" when fact ap5: waive intro;
